@@ -3,7 +3,775 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ヤフオク用 画像一括サイズ調整＆二重フチ取りツール</title>
+
+    <style>
+      /* --- 標準CSSによるユーティリティ定義（CDN代替） --- */
+      *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e2e8f0; }
+      body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f1f5f9; color: #1e293b; min-height: 100vh; padding: 1rem; }
+      @media (min-width: 768px) { body { padding: 2rem; } }
+
+      .max-w-6xl { max-width: 72rem; }
+      .mx-auto { margin-left: auto; margin-right: auto; }
+      .space-y-6 > * + * { margin-top: 1.5rem; }
+      .space-y-5 > * + * { margin-top: 1.25rem; }
+      .space-y-4 > * + * { margin-top: 1rem; }
+      .space-y-3 > * + * { margin-top: 0.75rem; }
+      .space-y-2 > * + * { margin-top: 0.5rem; }
+      .space-y-1 > * + * { margin-top: 0.25rem; }
+      .space-x-1 > * + * { margin-left: 0.25rem; }
+
+      .grid { display: grid; }
+      .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+      @media (min-width: 640px) {
+        .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      }
+      @media (min-width: 1024px) {
+        .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .lg\:col-span-1 { grid-column: span 1 / span 1; }
+        .lg\:col-span-2 { grid-column: span 2 / span 2; }
+      }
+      .gap-6 { gap: 1.5rem; }
+      .gap-4 { gap: 1rem; }
+      .gap-3 { gap: 0.75rem; }
+
+      .flex { display: flex; }
+      .flex-col { flex-direction: column; }
+      .items-center { align-items: center; }
+      .justify-between { justify-content: space-between; }
+      .justify-center { justify-content: center; }
+
+      .hidden { display: none !important; }
+      .cursor-pointer { cursor: pointer; }
+      .transition-all { transition: all 0.15s ease-in-out; }
+
+      .bg-white { background-color: #ffffff; }
+      .bg-slate-50 { background-color: #f8fafc; }
+      .bg-slate-100 { background-color: #f1f5f9; }
+      .bg-slate-200 { background-color: #e2e8f0; }
+      .bg-blue-50 { background-color: #eff6ff; }
+      .bg-blue-50\/50 { background-color: rgba(239, 246, 255, 0.5); }
+      .hover\:bg-blue-50:hover { background-color: #eff6ff; }
+      .bg-blue-100 { background-color: #dbeafe; }
+      .bg-blue-600 { background-color: #2563eb; }
+      .hover\:bg-blue-700:hover { background-color: #1d4ed8; }
+      .bg-red-50 { background-color: #fef2f2; }
+      .hover\:bg-red-100:hover { background-color: #fee2e2; }
+      .bg-orange-50\/50 { background-color: rgba(255, 247, 237, 0.5); }
+      .bg-slate-800 { background-color: #1e293b; }
+      .hover\:bg-slate-900:hover { background-color: #0f172a; }
+      .bg-amber-50\/20 { background-color: rgba(254, 243, 199, 0.2); }
+      .bg-amber-500 { background-color: #f59e0b; }
+      .bg-amber-100 { background-color: #fef3c7; }
+      .bg-purple-100 { background-color: #f3e8ff; }
+      .bg-black\/60 { background-color: rgba(0, 0, 0, 0.6); }
+
+      .text-slate-900 { color: #0f172a; }
+      .text-slate-800 { color: #1e293b; }
+      .text-slate-700 { color: #334155; }
+      .text-slate-600 { color: #475569; }
+      .text-slate-500 { color: #64748b; }
+      .text-slate-400 { color: #94a3b8; }
+      .text-blue-900 { color: #1e3a8a; }
+      .text-blue-800 { color: #1e40af; }
+      .text-blue-600 { color: #2563eb; }
+      .text-blue-500 { color: #3b82f6; }
+      .text-red-600 { color: #dc2626; }
+      .text-orange-900 { color: #7c2d12; }
+      .text-orange-800 { color: #9a3412; }
+      .text-amber-800 { color: #92400e; }
+      .text-purple-800 { color: #6b21a8; }
+      .text-white { color: #ffffff; }
+
+      .font-bold { font-weight: 700; }
+      .font-semibold { font-weight: 600; }
+      .font-medium { font-weight: 500; }
+      .font-extrabold { font-weight: 800; }
+
+      .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+      .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+      .text-xs { font-size: 0.75rem; line-height: 1rem; }
+      .text-\[11px\] { font-size: 11px; }
+      .text-\[10px\] { font-size: 10px; }
+
+      .p-6 { padding: 1.5rem; }
+      .p-4 { padding: 1rem; }
+      .p-3 { padding: 0.75rem; }
+      .p-2\.5 { padding: 0.625rem; }
+      .p-2 { padding: 0.5rem; }
+      .p-1 { padding: 0.25rem; }
+      .px-4 { padding-left: 1rem; padding-right: 1rem; }
+      .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+      .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+      .px-1\.5 { padding-left: 0.375rem; padding-right: 0.375rem; }
+      .py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+      .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+      .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+      .py-20 { padding-top: 5rem; padding-bottom: 5rem; }
+      .pb-2 { padding-bottom: 0.5rem; }
+      .pb-3 { padding-bottom: 0.75rem; }
+      .pt-1 { padding-top: 0.25rem; }
+      .pt-2 { padding-top: 0.5rem; }
+      .mt-1 { margin-top: 0.25rem; }
+      .mb-2 { margin-bottom: 0.5rem; }
+      .mb-3 { margin-bottom: 0.75rem; }
+      .mb-4 { margin-bottom: 1rem; }
+
+      .rounded-2xl { border-radius: 1rem; }
+      .rounded-xl { border-radius: 0.75rem; }
+      .rounded-lg { border-radius: 0.5rem; }
+      .rounded-full { border-radius: 9999px; }
+      .rounded { border-radius: 0.25rem; }
+
+      .border { border-width: 1px; }
+      .border-2 { border-width: 2px; }
+      .border-dashed { border-style: dashed; }
+      .border-slate-200 { border-color: #e2e8f0; }
+      .border-slate-300 { border-color: #cbd5e1; }
+      .border-blue-400 { border-color: #60a5fa; }
+      .border-red-200 { border-color: #fecaca; }
+      .border-orange-100 { border-color: #ffedd5; }
+      .hover\:border-blue-300:hover { border-color: #93c5fd; }
+      .border-0 { border-width: 0; }
+
+      .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+      .shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
+      .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+
+      .relative { position: relative; }
+      .absolute { position: absolute; }
+      .top-2 { top: 0.5rem; }
+      .left-2 { left: 0.5rem; }
+      .bottom-2 { bottom: 0.5rem; }
+      .right-2 { right: 0.5rem; }
+
+      .aspect-square { aspect-ratio: 1 / 1; }
+      .overflow-hidden { overflow: hidden; }
+      .overflow-y-auto { overflow-y: auto; }
+      .max-h-\[700px\] { max-height: 700px; }
+      .pr-2 { padding-right: 0.5rem; }
+      .col-span-full { grid-column: 1 / -1; }
+      .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .max-w-\[130px\] { max-width: 130px; }
+      .max-w-\[120px\] { max-width: 120px; }
+
+      .w-12 { width: 3rem; }
+      .h-12 { height: 3rem; }
+      .w-16 { width: 4rem; }
+      .h-16 { height: 4rem; }
+      .w-4 { width: 1rem; }
+      .h-4 { height: 1rem; }
+      .w-8 { width: 2rem; }
+      .h-8 { height: 2rem; }
+      .w-full { width: 100%; }
+      .h-full { height: 100%; }
+      .max-w-full { max-width: 100%; }
+      .max-h-full { max-height: 100%; }
+      .object-contain { object-fit: contain; }
+
+      .outline-none { outline: 2px solid transparent; outline-offset: 2px; }
+      .backdrop-blur-sm { backdrop-filter: blur(4px); }
+
+      /* 選択カード用カスタムスタイル */
+      .selected-card {
+        outline: 6px solid #f59e0b !important;
+        outline-offset: -2px;
+        box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4) !important;
+      }
+
+      /* カラーピッカーの潰れ・スタイル崩れ防止 */
+      input[type="color"] { appearance: none; background: #ffffff; cursor: pointer; border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 2px; }
+      input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+      input[type="color"]::-webkit-color-swatch { border: none; border-radius: 0.375rem; }
+    </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen p-4 md:p-8">
+    <div class="max-w-6xl mx-auto space-y-6">
+      <!-- ヘッダー -->
+      <header class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+        <h1 class="text-2xl font-bold text-slate-900">ヤフオク用 画像一括サイズ調整 ＆ 二重フチ取りツール</h1>
+        <p class="text-sm text-slate-600 mt-1">
+          キャンバスサイズ・余白背景色・二重フチを自在に調整できます。Ctrl＋クリックで複数選択、画像クリックで個別編集、何もない場所をクリックで全体編集に戻ります。
+        </p>
+      </header>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 左側：設定パネル -->
+        <div class="lg:col-span-1 space-y-6">
+          <!-- ドロップゾーン -->
+          <div id="drop-zone" class="border-2 border-dashed border-blue-400 bg-blue-50/50 hover:bg-blue-50 rounded-2xl p-6 text-center cursor-pointer transition-all">
+            <svg class="w-12 h-12 mx-auto text-blue-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+            </svg>
+            <p class="font-semibold text-blue-900 text-sm">ここに画像をドラッグ＆ドロップ</p>
+            <p class="text-xs text-blue-600 mt-1">またはクリックしてファイルを選択（複数可）</p>
+            <input type="file" id="file-input" class="hidden" accept="image/*" multiple />
+          </div>
+
+          <!-- 編集設定 -->
+          <div id="settings-panel" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5">
+            <div class="border-b pb-2 flex justify-between items-center">
+              <h2 class="font-bold text-slate-900" id="settings-title">一括編集設定</h2>
+              <span id="target-mode-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800">全体に適用</span>
+            </div>
+
+            <!-- 選択中画像の削除ボタン（選択時のみ表示） -->
+            <div id="delete-action-area" class="hidden">
+              <button id="btn-delete-selected" class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2 px-3 rounded-xl border border-red-200 transition-all text-xs flex items-center justify-center space-x-1">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                </svg>
+                <span id="btn-delete-text">選択中の画像を削除</span>
+              </button>
+            </div>
+
+            <!-- キャンバス基本設定（サイズ・余白背景色） -->
+            <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <h3 class="text-xs font-bold text-slate-800 border-b border-slate-200 pb-1">キャンバス設定 (1:1 固定)</h3>
+              <div class="grid grid-cols-2 gap-3">
+                <div class="space-y-1">
+                  <label class="text-[11px] font-semibold text-slate-600">画像サイズ (px)</label>
+                  <input type="number" id="canvas-size" value="1200" min="100" max="4000" step="10" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white" />
+                </div>
+                <div class="space-y-1">
+                  <label class="text-[11px] font-semibold text-slate-600">余白の背景色</label>
+                  <input type="color" id="bg-color" value="#FFFFFF" class="w-full h-[38px] rounded-lg cursor-pointer border border-slate-300 block" />
+                </div>
+              </div>
+            </div>
+
+            <!-- フチの適用範囲・方向 -->
+            <div class="space-y-3">
+              <div class="space-y-1">
+                <label class="text-xs font-semibold text-slate-700">フチを適用する対象</label>
+                <select id="target-scope" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                  <option value="image">本来の画像の部分だけ</option>
+                  <option value="canvas">キャンバス全体（余白含む）</option>
+                </select>
+              </div>
+
+              <div class="space-y-1">
+                <label class="text-xs font-semibold text-slate-700">フチの方向（揃え方）</label>
+                <select id="border-align" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none">
+                  <option value="outside" selected>外側揃え（端にフィット）</option>
+                  <option value="inside">内側揃え（内側へ描画）</option>
+                </select>
+              </div>
+            </div>
+
+            <hr class="border-slate-100" />
+
+            <!-- 1層目（外側フチ・橙）設定 -->
+            <div class="space-y-3 bg-orange-50/50 p-4 rounded-xl border border-orange-100">
+              <div class="flex justify-between items-center">
+                <label class="text-xs font-bold text-orange-900">1層目：外側フチ（一番外側）</label>
+                <input type="color" id="outer-color" value="#F58220" class="w-8 h-8 rounded-lg border border-slate-300 cursor-pointer" />
+              </div>
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs text-orange-800">
+                  <span>太さ</span>
+                  <span id="outer-size-val">30px</span>
+                </div>
+                <input type="range" id="outer-size" min="0" max="100" value="30" class="w-full accent-orange-500" />
+              </div>
+            </div>
+
+            <!-- 2層目（内側フチ・白）設定 -->
+            <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+              <div class="flex justify-between items-center">
+                <label class="text-xs font-bold text-slate-900">2層目：内側フチ（画像/1層目の間に挟む）</label>
+                <input type="color" id="inner-color" value="#FFFFFF" class="w-8 h-8 rounded-lg border border-slate-300 cursor-pointer" />
+              </div>
+              <div class="space-y-1">
+                <div class="flex justify-between text-xs text-slate-700">
+                  <span>太さ</span>
+                  <span id="inner-size-val">30px</span>
+                </div>
+                <input type="range" id="inner-size" min="0" max="100" value="30" class="w-full accent-blue-500" />
+              </div>
+            </div>
+
+            <!-- アクションボタン -->
+            <div class="pt-2 space-y-2">
+              <button id="btn-download-all" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-xl shadow transition-all text-sm hidden">
+                すべて一括ダウンロード
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 右側：プレビュー＆結果エリア -->
+        <div class="lg:col-span-2 space-y-4">
+          <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 min-h-[500px] flex flex-col">
+            <div class="flex justify-between items-center border-b pb-3 mb-4">
+              <h2 class="font-bold text-slate-900">処理済み画像一覧 (<span id="image-count">0</span>件)</h2>
+              <span class="text-xs text-slate-500">※Ctrl+クリックで複数選択／背景クリックで全選択復帰</span>
+            </div>
+
+            <!-- プレビューグリッド -->
+            <div id="preview-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[700px] pr-2 p-1">
+              <div id="empty-state" class="col-span-full py-20 text-center text-slate-400">
+                <svg class="w-16 h-16 mx-auto mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                </svg>
+                <p class="text-sm">画像がまだ追加されていません</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- JavaScript処理ロジック -->
+    <script>
+      const dropZone = document.getElementById("drop-zone");
+      const fileInput = document.getElementById("file-input");
+      const previewContainer = document.getElementById("preview-container");
+      const emptyState = document.getElementById("empty-state");
+      const imageCount = document.getElementById("image-count");
+      const btnDownloadAll = document.getElementById("btn-download-all");
+
+      const settingsTitle = document.getElementById("settings-title");
+      const targetModeBadge = document.getElementById("target-mode-badge");
+      const deleteActionArea = document.getElementById("delete-action-area");
+      const btnDeleteSelected = document.getElementById("btn-delete-selected");
+      const btnDeleteText = document.getElementById("btn-delete-text");
+
+      const canvasSizeInput = document.getElementById("canvas-size");
+      const bgColorInput = document.getElementById("bg-color");
+
+      const outerColorInput = document.getElementById("outer-color");
+      const outerSizeInput = document.getElementById("outer-size");
+      const outerSizeVal = document.getElementById("outer-size-val");
+
+      const innerColorInput = document.getElementById("inner-color");
+      const innerSizeInput = document.getElementById("inner-size");
+      const innerSizeVal = document.getElementById("inner-size-val");
+
+      const targetScopeSelect = document.getElementById("target-scope");
+      const borderAlignSelect = document.getElementById("border-align");
+
+      let globalSettings = {
+        canvasSize: 1200,
+        bgColor: "#FFFFFF",
+        outerColor: "#F58220",
+        outerSize: 30,
+        innerColor: "#FFFFFF",
+        innerSize: 30,
+        targetScope: "image",
+        borderAlign: "outside",
+      };
+
+      let uploadedFiles = [];
+      let selectedImageIds = [];
+      let renderTimer = null;
+
+      outerSizeInput.addEventListener("input", () => {
+        outerSizeVal.textContent = outerSizeInput.value + "px";
+        handleSettingChange();
+      });
+      innerSizeInput.addEventListener("input", () => {
+        innerSizeVal.textContent = innerSizeInput.value + "px";
+        handleSettingChange();
+      });
+
+      [canvasSizeInput, targetScopeSelect, borderAlignSelect].forEach((el) => {
+        el.addEventListener("change", () => handleSettingChange(true));
+      });
+
+      [bgColorInput, outerColorInput, innerColorInput].forEach((el) => {
+        el.addEventListener("input", () => handleSettingChange(false));
+        el.addEventListener("change", () => handleSettingChange(true));
+      });
+
+      btnDeleteSelected.addEventListener("click", () => {
+        if (selectedImageIds.length === 0) return;
+        uploadedFiles = uploadedFiles.filter(
+          (item) => !selectedImageIds.includes(item.id),
+        );
+        selectedImageIds = [];
+        updateImageCount();
+        updateUIForSelection();
+        syncFormWithConfig(globalSettings);
+        renderAllPreviews();
+      });
+
+      document.addEventListener("click", (e) => {
+        if (selectedImageIds.length === 0) return;
+        const isCard = e.target.closest(".image-card");
+        const isSettings = e.target.closest("#settings-panel");
+        const isDropZone = e.target.closest("#drop-zone");
+
+        if (!isCard && !isSettings && !isDropZone) {
+          resetToGlobalMode();
+        }
+      });
+
+      function resetToGlobalMode() {
+        selectedImageIds = [];
+        updateUIForSelection();
+        syncFormWithConfig(globalSettings);
+        renderAllPreviews();
+      }
+
+      dropZone.addEventListener("click", () => fileInput.click());
+      dropZone.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropZone.classList.add("bg-blue-100");
+      });
+      dropZone.addEventListener("dragleave", () =>
+        dropZone.classList.remove("bg-blue-100"),
+      );
+      dropZone.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropZone.classList.remove("bg-blue-100");
+        if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files);
+      });
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files.length > 0) handleFiles(e.target.files);
+      });
+
+      function handleFiles(files) {
+        for (let file of files) {
+          if (!file.type.startsWith("image/")) continue;
+          const reader = new FileReader();
+          reader.onload = (e) => {
+            const img = new Image();
+            img.onload = () => {
+              uploadedFiles.push({
+                id:
+                  "img_" +
+                  Date.now() +
+                  "_" +
+                  Math.random().toString(36).substr(2, 9),
+                file: file,
+                name: file.name,
+                img: img,
+                config: JSON.parse(JSON.stringify(globalSettings)),
+              });
+              updateImageCount();
+              renderAllPreviews();
+            };
+            img.src = e.target.result;
+          };
+          reader.readAsDataURL(file);
+        }
+      }
+
+      function updateImageCount() {
+        imageCount.textContent = uploadedFiles.length;
+        if (uploadedFiles.length > 0) {
+          emptyState.style.display = "none";
+          btnDownloadAll.classList.remove("hidden");
+        } else {
+          emptyState.style.display = "block";
+          btnDownloadAll.classList.add("hidden");
+        }
+      }
+
+      function handleSettingChange(immediate = true) {
+        const sizeVal = parseInt(canvasSizeInput.value) || 1200;
+        const currentConfig = {
+          canvasSize: sizeVal,
+          bgColor: bgColorInput.value,
+          outerColor: outerColorInput.value,
+          outerSize: parseInt(outerSizeInput.value) || 0,
+          innerColor: innerColorInput.value,
+          innerSize: parseInt(innerSizeInput.value) || 0,
+          targetScope: targetScopeSelect.value,
+          borderAlign: borderAlignSelect.value,
+        };
+
+        if (selectedImageIds.length === 0) {
+          globalSettings = { ...currentConfig };
+          uploadedFiles.forEach((item) => (item.config = { ...currentConfig }));
+        } else {
+          uploadedFiles.forEach((item) => {
+            if (selectedImageIds.includes(item.id)) {
+              item.config = { ...currentConfig };
+            }
+          });
+        }
+
+        if (immediate) {
+          renderAllPreviews();
+        } else {
+          clearTimeout(renderTimer);
+          renderTimer = setTimeout(() => {
+            renderAllPreviews();
+          }, 30);
+        }
+      }
+
+      function syncFormWithConfig(config) {
+        canvasSizeInput.value = config.canvasSize;
+        bgColorInput.value = config.bgColor;
+
+        outerColorInput.value = config.outerColor;
+        outerSizeInput.value = config.outerSize;
+        outerSizeVal.textContent = config.outerSize + "px";
+
+        innerColorInput.value = config.innerColor;
+        innerSizeInput.value = config.innerSize;
+        innerSizeVal.textContent = config.innerSize + "px";
+
+        targetScopeSelect.value = config.targetScope;
+        borderAlignSelect.value = config.borderAlign;
+      }
+
+      function updateUIForSelection() {
+        if (selectedImageIds.length === 0) {
+          settingsTitle.textContent = "一括編集設定";
+          targetModeBadge.textContent = "全体に適用";
+          targetModeBadge.className =
+            "text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800";
+          deleteActionArea.classList.add("hidden");
+        } else if (selectedImageIds.length === 1) {
+          const target = uploadedFiles.find(
+            (item) => item.id === selectedImageIds[0],
+          );
+          settingsTitle.textContent = "個別編集設定";
+          targetModeBadge.textContent = target ? target.name : "個別選択中";
+          targetModeBadge.className =
+            "text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 truncate max-w-[120px]";
+          btnDeleteText.textContent = "この画像を削除";
+          deleteActionArea.classList.remove("hidden");
+        } else {
+          settingsTitle.textContent = "複数選択編集設定";
+          targetModeBadge.textContent = `選択中: ${selectedImageIds.length}件`;
+          targetModeBadge.className =
+            "text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-100 text-purple-800";
+          btnDeleteText.textContent = `選択中の${selectedImageIds.length}件を削除`;
+          deleteActionArea.classList.remove("hidden");
+        }
+      }
+
+      function renderAllPreviews() {
+        previewContainer.innerHTML = "";
+        if (uploadedFiles.length === 0) {
+          previewContainer.appendChild(emptyState);
+          return;
+        }
+
+        uploadedFiles.forEach((item) => {
+          const canvas = generateCanvas(item);
+          const dataUrl = canvas.toDataURL("image/jpeg", 0.92);
+
+          const isSelected = selectedImageIds.includes(item.id);
+
+          const card = document.createElement("div");
+          card.className = `image-card bg-slate-50 border border-slate-200 rounded-2xl p-3 flex flex-col space-y-2 cursor-pointer transition-all ${
+            isSelected
+              ? "selected-card bg-amber-50/20"
+              : "hover:border-blue-300"
+          }`;
+
+          card.onclick = (e) => {
+            if (e.target.tagName === "A") return;
+            e.stopPropagation();
+
+            if (e.ctrlKey || e.metaKey) {
+              if (isSelected) {
+                selectedImageIds = selectedImageIds.filter(
+                  (id) => id !== item.id,
+                );
+              } else {
+                selectedImageIds.push(item.id);
+              }
+            } else {
+              selectedImageIds = [item.id];
+            }
+
+            updateUIForSelection();
+            if (selectedImageIds.length === 1) {
+              syncFormWithConfig(item.config);
+            }
+            renderAllPreviews();
+          };
+
+          const sizeText = `${item.config.canvasSize}×${item.config.canvasSize}px`;
+
+          card.innerHTML = `
+                    <div class="aspect-square bg-slate-200 rounded-xl overflow-hidden border border-slate-200 relative flex items-center justify-center">
+                        <img src="${dataUrl}" class="max-w-full max-h-full object-contain">
+                        ${isSelected ? '<span class="absolute top-2 left-2 bg-amber-500 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full shadow-lg">選択中</span>' : ""}
+                        <span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded backdrop-blur-sm">${sizeText}</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs text-slate-600 pt-1">
+                        <span class="truncate max-w-[130px] font-medium" title="${item.name}">${item.name}</span>
+                        <a href="${dataUrl}" download="${item.config.canvasSize}_${item.name.replace(/\.[^/.]+$/, "")}.jpg" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1 rounded-lg transition-all shadow-sm">
+                            保存
+                        </a>
+                    </div>
+                `;
+          previewContainer.appendChild(card);
+        });
+      }
+
+      // ==========================================
+      // 【二軸四象限 完全分離によるキャンバス生成ロジック】
+      // ==========================================
+      function generateCanvas(item) {
+        const cfg = item.config;
+        const size = cfg.canvasSize || 1200;
+
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext("2d");
+
+        // 全体の背景色を塗りつぶし
+        ctx.fillStyle = cfg.bgColor;
+        ctx.fillRect(0, 0, size, size);
+
+        const imgW = item.img.width;
+        const imgH = item.img.height;
+        const totalBorderSize = cfg.outerSize + cfg.innerSize;
+
+        let baseBox = { x: 0, y: 0, w: size, h: size };
+        let drawW = 0, drawH = 0, drawX = 0, drawY = 0;
+
+        // 象限①：[本来の画像の部分だけ] × [外側揃え]
+        if (cfg.targetScope === "image" && cfg.borderAlign === "outside") {
+            const maxAllowedSize = Math.max(10, size - (totalBorderSize * 2));
+            const scale = maxAllowedSize / Math.max(imgW, imgH);
+            drawW = imgW * scale;
+            drawH = imgH * scale;
+            drawX = (size - drawW) / 2;
+            drawY = (size - drawH) / 2;
+
+            ctx.drawImage(item.img, drawX, drawY, drawW, drawH);
+            baseBox = { x: drawX, y: drawY, w: drawW, h: drawH };
+            drawOutsideBorders(ctx, baseBox, cfg.outerColor, cfg.outerSize, cfg.innerColor, cfg.innerSize);
+        }
+
+        // 象限②：[本来の画像の部分だけ] × [内側揃え]
+        else if (cfg.targetScope === "image" && cfg.borderAlign === "inside") {
+            const scale = size / Math.max(imgW, imgH);
+            drawW = imgW * scale;
+            drawH = imgH * scale;
+            drawX = (size - drawW) / 2;
+            drawY = (size - drawH) / 2;
+
+            ctx.drawImage(item.img, drawX, drawY, drawW, drawH);
+            baseBox = { x: drawX, y: drawY, w: drawW, h: drawH };
+            drawInsideBorders(ctx, baseBox, cfg.outerColor, cfg.outerSize, cfg.innerColor, cfg.innerSize);
+        }
+
+        // 象限③：[キャンバス全体] × [外側揃え]
+        else if (cfg.targetScope === "canvas" && cfg.borderAlign === "outside") {
+            const innerCanvasSize = Math.max(10, size - (totalBorderSize * 2));
+            const scale = innerCanvasSize / Math.max(imgW, imgH);
+            drawW = imgW * scale;
+            drawH = imgH * scale;
+
+            const offsetX = (size - innerCanvasSize) / 2;
+            const offsetY = (size - innerCanvasSize) / 2;
+            drawX = offsetX + (innerCanvasSize - drawW) / 2;
+            drawY = offsetY + (innerCanvasSize - drawH) / 2;
+
+            ctx.drawImage(item.img, drawX, drawY, drawW, drawH);
+            baseBox = { x: offsetX, y: offsetY, w: innerCanvasSize, h: innerCanvasSize };
+            drawOutsideBorders(ctx, baseBox, cfg.outerColor, cfg.outerSize, cfg.innerColor, cfg.innerSize);
+        }
+
+        // 象限④：[キャンバス全体] × [内側揃え]
+        else if (cfg.targetScope === "canvas" && cfg.borderAlign === "inside") {
+            const scale = size / Math.max(imgW, imgH);
+            drawW = imgW * scale;
+            drawH = imgH * scale;
+            drawX = (size - drawW) / 2;
+            drawY = (size - drawH) / 2;
+
+            ctx.drawImage(item.img, drawX, drawY, drawW, drawH);
+            baseBox = { x: 0, y: 0, w: size, h: size };
+            drawInsideBorders(ctx, baseBox, cfg.outerColor, cfg.outerSize, cfg.innerColor, cfg.innerSize);
+        }
+
+        return canvas;
+      }
+
+      // ==========================================
+      // 【フチ描画ヘルパー関数】
+      // ==========================================
+      
+      // 内側揃え：基準枠の境界から内側へ（1層目：外側橙、2層目：内側白）
+      function drawInsideBorders(ctx, box, outerColor, outerSize, innerColor, innerSize) {
+        ctx.save();
+        let { x, y, w, h } = box;
+        if (outerSize > 0) {
+          ctx.fillStyle = outerColor;
+          drawFrame(ctx, x, y, w, h, outerSize);
+        }
+        if (innerSize > 0) {
+          ctx.fillStyle = innerColor;
+          drawFrame(
+            ctx,
+            x + outerSize,
+            y + outerSize,
+            w - (outerSize * 2),
+            h - (outerSize * 2),
+            innerSize,
+          );
+        }
+        ctx.restore();
+      }
+
+      // 外側揃え：基準枠の境界から外側へ（2層目：内側白が接し、1層目：外側橙が一番外側）
+      function drawOutsideBorders(ctx, box, outerColor, outerSize, innerColor, innerSize) {
+        ctx.save();
+        let { x, y, w, h } = box;
+        if (innerSize > 0) {
+          ctx.fillStyle = innerColor;
+          drawFrame(
+            ctx,
+            x - innerSize,
+            y - innerSize,
+            w + (innerSize * 2),
+            h + (innerSize * 2),
+            innerSize,
+          );
+        }
+        if (outerSize > 0) {
+          ctx.fillStyle = outerColor;
+          const offsetEnd = innerSize + outerSize;
+          drawFrame(
+            ctx,
+            x - offsetEnd,
+            y - offsetEnd,
+            w + (offsetEnd * 2),
+            h + (offsetEnd * 2),
+            outerSize,
+          );
+        }
+        ctx.restore();
+      }
+
+      // 枠の塗りつぶし用描画ヘルパー
+      function drawFrame(ctx, x, y, w, h, size) {
+        if (w <= 0 || h <= 0 || size <= 0) return;
+        ctx.beginPath();
+        ctx.rect(x, y, w, h);
+        ctx.rect(x + size, y + h - size, w - (size * 2), -(h - (size * 2)));
+        ctx.fill();
+      }
+
+      btnDownloadAll.addEventListener("click", () => {
+        const links = previewContainer.querySelectorAll("a[download]");
+        links.forEach((link, idx) => {
+          setTimeout(() => {
+            link.click();
+          }, idx * 200);
+        });
+      });
+    </script>
+</body>
+</html>ヤフオク用 画像一括サイズ調整＆二重フチ取りツール</title>
 
     <style>
       /* --- 標準CSSによるユーティリティ定義（CDN代替） --- */
