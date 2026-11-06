@@ -6,7 +6,7 @@
     <title>ヤフオク用 画像一括サイズ調整＆二重フチ取りツール</title>
 
     <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
-    
+
     <style>
       /* --- 標準CSSによるユーティリティ定義（CDN代替） --- */
       *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e2e8f0; }
@@ -750,12 +750,18 @@
       }
 
       // 枠の塗りつぶし用描画ヘルパー
+      // iPhone (Safari) のくり抜きバグを防止した描画処理
       function drawFrame(ctx, x, y, w, h, size) {
         if (w <= 0 || h <= 0 || size <= 0) return;
+        
         ctx.beginPath();
+        // 1. 外側の四角形
         ctx.rect(x, y, w, h);
-        ctx.rect(x + size, y + h - size, w - (size * 2), -(h - (size * 2)));
-        ctx.fill();
+        // 2. 内側の四角形（正の数値で指定）
+        ctx.rect(x + size, y + size, w - (size * 2), h - (size * 2));
+        
+        // evenodd ルールを指定することで、iPhoneでも確実に内側がくり抜かれる
+        ctx.fill('evenodd');
       }
 
       btnDownloadAll.addEventListener("click", () => {
