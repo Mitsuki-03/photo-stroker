@@ -724,7 +724,7 @@
               <div class="space-y-3 text-xs" id="adjustments-container">
                 <div class="space-y-1">
                   <div class="flex justify-between font-medium text-slate-700">
-                    <span>露出 (Exposure)</span
+                    <span>[1] 露出 (Exposure)</span
                     ><span id="val-exposure">0</span>
                   </div>
                   <input
@@ -738,7 +738,7 @@
                 </div>
                 <div class="space-y-1">
                   <div class="flex justify-between font-medium text-slate-700">
-                    <span>ブリリアンス (Brilliance)</span
+                    <span>[2] ブリリアンス (Brilliance)</span
                     ><span id="val-brilliance">0</span>
                   </div>
                   <input
@@ -749,8 +749,8 @@
                     value="0"
                     class="w-full"
                   />
-                <!--
                 </div>
+                <!--
                 <div class="space-y-1">
                   <div class="flex justify-between font-medium text-slate-700">
                     <span>[3] ハイライト (Highlights)</span
@@ -778,11 +778,11 @@
                     value="0"
                     class="w-full"
                   />
-                -->
                 </div>
+                -->
                 <div class="space-y-1">
                   <div class="flex justify-between font-medium text-slate-700">
-                    <span>コントラスト (Contrast)</span
+                    <span>[5] コントラスト (Contrast)</span
                     ><span id="val-contrast">0</span>
                   </div>
                   <input
@@ -793,7 +793,6 @@
                     value="0"
                     class="w-full"
                   />
-                  <!--
                 </div>
                 <div class="space-y-1">
                   <div class="flex justify-between font-medium text-slate-700">
@@ -809,6 +808,7 @@
                     class="w-full"
                   />
                 </div>
+                <!--
                 <div class="space-y-1">
                   <div class="flex justify-between font-medium text-slate-700">
                     <span>[7] ブラックポイント (Black Point)</span
@@ -933,8 +933,8 @@
                     value="0"
                     class="w-full"
                   />
-                  -->
                 </div>
+                -->
               </div>
             </div>
 
@@ -1606,6 +1606,9 @@
           brilLut = buildBrillianceLut(Math.min(1, brilliance));
         }
 
+        // [6] 明るさの事前計算：スライダー量を反映した輝度カーブ/色差係数のLUT
+        const brightLut = brightness !== 0 ? buildBrightnessLut(brightness) : null;
+
         for (let i = 0; i < len; i += 4) {
           let r = data[i] / 255;
           let g = data[i + 1] / 255;
@@ -1706,13 +1709,20 @@
             b = (b - 0.5) * contrastScale + 0.5;
           }
 
-          // [6] Brightness: Output = pow(Input, (1.0 - Brightness_Value))
+          // [6] Brightness: 実機(iPhone)の MAX/MIN 画像比較から逆算
+          //   輝度Yにだけトーンカーブ(F)をかけ、色差(R-Y, G-Y, B-Y)は輝度に応じた係数(K)で増減する
+          //   → 明るくすると彩度が下がり、暗くすると彩度が上がる実機の挙動を再現
           if (brightness !== 0) {
-            // 端点(0と1)を固定し、中間調のガンマ値だけを変化させる
-            const gamma = Math.pow(2.0, -brightness);
-            r = Math.pow(Math.max(0, r), gamma);
-            g = Math.pow(Math.max(0, g), gamma);
-            b = Math.pow(Math.max(0, b), gamma);
+            const rc = Math.min(1, Math.max(0, r));
+            const gc = Math.min(1, Math.max(0, g));
+            const bc = Math.min(1, Math.max(0, b));
+            const yIn = 0.299 * rc + 0.587 * gc + 0.114 * bc;
+            const bi = Math.round(yIn * 1024);
+            const yOut = brightLut.f[bi];
+            const kc = brightLut.k[bi];
+            r = Math.min(1, Math.max(0, yOut + kc * (rc - yIn)));
+            g = Math.min(1, Math.max(0, yOut + kc * (gc - yIn)));
+            b = Math.min(1, Math.max(0, yOut + kc * (bc - yIn)));
           }
 
           // [7] Black Point: Output = (Input - BlackPoint_Value) / (1.0 - BlackPoint_Value)
@@ -1789,6 +1799,49 @@
         }
 
         ctx.putImageData(imgData, 0, 0);
+      }
+
+      // ==========================================
+      // [6] 明るさ(Brightness)用ヘルパー
+      //  実機画像(元画像 vs 明るさMAX / MIN)から逆算した変換テーブル
+      //  Y_out = F(Y),  out = Y_out + K(Y) * (in - Y)     Y: 輝度(0.299R+0.587G+0.114B)
+      //  F: 輝度カーブ（MAX: 暗部を持ち上げ白は固定 / MIN: 輝度0.4以下を黒に潰し線形に引き伸ばす）
+      //  K: 色差の増減率（MAX: 明部ほど彩度が下がる / MIN: 彩度が上がる）
+      //  スライダー値は「恒等変換 → MAX(MIN)」への補間量として F, K に反映される
+      // ==========================================
+      const BRIGHT_MAX = {
+        fx: [0.0, 0.039, 0.322, 0.463, 0.592, 0.714, 0.831, 0.945, 1.0],
+        fy: [0.0, 0.068, 0.453, 0.627, 0.767, 0.874, 0.952, 0.995, 1.0],
+        kx: [0.0, 0.021, 0.104, 0.521, 0.854, 0.979, 1.0],
+        ky: [1.2, 1.2, 1.02, 0.74, 0.54, 0.34, 0.34],
+      };
+      const BRIGHT_MIN = {
+        fx: [0.0, 0.404, 0.498, 0.678, 0.835, 1.0],
+        fy: [0.0, 0.007, 0.155, 0.426, 0.689, 0.995],
+        kx: [0.0, 0.021, 0.104, 0.146, 0.396, 0.729, 0.854, 0.979, 1.0],
+        ky: [0.52, 0.52, 0.4, 0.44, 1.28, 1.28, 1.42, 1.42, 1.42],
+      };
+
+      // 区分線形補間
+      function interpKnots(xs, ys, v) {
+        let s = 0;
+        while (s < xs.length - 2 && v > xs[s + 1]) s++;
+        const t = (v - xs[s]) / (xs[s + 1] - xs[s]);
+        return ys[s] + (ys[s + 1] - ys[s]) * Math.min(1, Math.max(0, t));
+      }
+
+      function buildBrightnessLut(brightness) {
+        const t = brightness > 0 ? BRIGHT_MAX : BRIGHT_MIN;
+        const p = Math.min(1, Math.abs(brightness)); // 0〜1
+        const n = 1024;
+        const f = new Float32Array(n + 1);
+        const k = new Float32Array(n + 1);
+        for (let i = 0; i <= n; i++) {
+          const y = i / n;
+          f[i] = y + p * (interpKnots(t.fx, t.fy, y) - y); // p=0で恒等、p=1で実機MAX/MIN
+          k[i] = 1 + p * (interpKnots(t.kx, t.ky, y) - 1);
+        }
+        return { f, k };
       }
 
       // ==========================================
