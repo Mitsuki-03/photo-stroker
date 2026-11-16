@@ -486,7 +486,7 @@
           ヤフオク用 画像一括サイズ調整 ＆ 二重フチ取り・色調補正ツール
         </h1>
         <p class="text-sm text-slate-600 mt-1">
-          iPhone写真アプリ同等の15種の色調補正（正確な数学的アルゴリズム実装版）、キャンバスサイズ・余白背景色・二重フチを自在に調整できます。
+          iPhone写真アプリ同等の色調補正（正確な数学的アルゴリズム実装版）、キャンバスサイズ・余白背景色・二重フチを自在に調整できます。
         </p>
       </header>
 
@@ -750,7 +750,6 @@
                     class="w-full"
                   />
                 </div>
-                <!--
                 <div class="space-y-1">
                   <div class="flex justify-between font-medium text-slate-700">
                     <span>[3] ハイライト (Highlights)</span
@@ -779,7 +778,6 @@
                     class="w-full"
                   />
                 </div>
-                -->
                 <div class="space-y-1">
                   <div class="flex justify-between font-medium text-slate-700">
                     <span>[5] コントラスト (Contrast)</span
@@ -808,7 +806,6 @@
                     class="w-full"
                   />
                 </div>
-                <!--
                 <div class="space-y-1">
                   <div class="flex justify-between font-medium text-slate-700">
                     <span>[7] ブラックポイント (Black Point)</span
@@ -823,118 +820,8 @@
                     class="w-full"
                   />
                 </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[8] 彩度 (Saturation)</span
-                    ><span id="val-saturation">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-saturation"
-                    min="-100"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[9] 自然な彩度 (Vibrancy)</span
-                    ><span id="val-vibrance">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-vibrance"
-                    min="-100"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[10] 暖かみ (Warmth)</span
-                    ><span id="val-warmth">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-warmth"
-                    min="-100"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[11] 色合い (Tint)</span><span id="val-tint">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-tint"
-                    min="-100"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[12] シャープネス (Sharpness)</span
-                    ><span id="val-sharpness">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-sharpness"
-                    min="0"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[13] 精細度 (Definition)</span
-                    ><span id="val-definition">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-definition"
-                    min="0"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[14] ノイズ除去 (Noise Reduction)</span
-                    ><span id="val-noiseReduction">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-noiseReduction"
-                    min="0"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[15] ビネット (Vignette)</span
-                    ><span id="val-vignette">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-vignette"
-                    min="0"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                -->
+                <!-- [8]〜[15] 未実装のためコメントアウト -->
+                <!-- <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br> -->
               </div>
             </div>
 
@@ -1034,14 +921,6 @@
         "contrast",
         "brightness",
         "blackPoint",
-        "saturation",
-        "vibrance",
-        "warmth",
-        "tint",
-        "sharpness",
-        "definition",
-        "noiseReduction",
-        "vignette",
       ];
 
       const defaultAdjustments = {
@@ -1052,14 +931,6 @@
         contrast: 0,
         brightness: 0,
         blackPoint: 0,
-        saturation: 0,
-        vibrance: 0,
-        warmth: 0,
-        tint: 0,
-        sharpness: 0,
-        definition: 0,
-        noiseReduction: 0,
-        vignette: 0,
       };
 
       let globalSettings = {
@@ -1301,11 +1172,22 @@
         }
       }
 
+      // ==========================================
+      // プレビュー描画（1枚時は大きく、2枚以上は2カラムグリッド）
+      // ==========================================
       function renderAllPreviews() {
         previewContainer.innerHTML = "";
         if (uploadedFiles.length === 0) {
           previewContainer.appendChild(emptyState);
+          previewContainer.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1";
           return;
+        }
+
+        // 1枚のみの場合は1列にして中央に大きく表示、2枚以上の場合は2カラムグリッド
+        if (uploadedFiles.length === 1) {
+          previewContainer.className = "grid grid-cols-1 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1";
+        } else {
+          previewContainer.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1";
         }
 
         uploadedFiles.forEach((item) => {
@@ -1314,7 +1196,10 @@
           const isSelected = selectedImageIds.includes(item.id);
 
           const card = document.createElement("div");
+          // 1枚のときは max-w-2xl mx-auto w-full を適用して右側領域いっぱいに大きく表示
           card.className = `image-card bg-slate-50 border border-slate-200 rounded-2xl p-3 flex flex-col space-y-2 cursor-pointer transition-all ${
+            uploadedFiles.length === 1 ? "max-w-2xl mx-auto w-full" : ""
+          } ${
             isSelected
               ? "selected-card bg-amber-50/20"
               : "hover:border-blue-300"
@@ -1535,10 +1420,6 @@
           );
         }
 
-        if (cfg.adjustments && cfg.adjustments.vignette > 0) {
-          applyVignette(ctx, renderSize, cfg.adjustments.vignette);
-        }
-
         return canvas;
       }
 
@@ -1548,7 +1429,7 @@
       }
 
       // ==========================================
-      // 正確なiPhone風 15種色調補正エンジン[cite: 1, 2]
+      // 色調補正エンジン
       // ==========================================
       function applyColorAdjustments(
         ctx,
@@ -1570,54 +1451,24 @@
           contrastVal >= 0 ? 1.0 + contrastVal * 1.5 : 1.0 + contrastVal * 0.7;
         const brightness = (adj.brightness || 0) / 100;
         const blackPoint = (adj.blackPoint || 0) / 100;
-        const saturation = (adj.saturation || 0) / 100;
-        const saturationScale =
-          saturation >= 0 ? 1.0 + saturation * 2.0 : 1.0 + saturation;
-        const vibrance = (adj.vibrance || 0) / 100;
-        const warmth = (adj.warmth || 0) / 100;
-        const tint = (adj.tint || 0) / 100;
-        const sharpness = (adj.sharpness || 0) / 100;
-        const definition = (adj.definition || 0) / 100;
-        const noiseReduction = adj.noiseReduction || 0;
 
-        // [14] ノイズ除去 (Bilateral / 平滑化) - フル解像度時のみ
-        if (isFullResolution && noiseReduction > 0) {
-          applyNoiseReductionFilter(data, width, height, noiseReduction / 100);
-        }
-
-        // [12] シャープネス & [13] 精細度 用のぼかしバッファ事前生成
-        let blurData = null;
-        let wideBlurData = null;
-        if (isFullResolution) {
-          if (sharpness > 0) {
-            blurData = createGaussianBlurData(data, width, height, 1.5);
-          }
-          if (definition > 0) {
-            wideBlurData = createGaussianBlurData(data, width, height, 8.0);
-          }
-        }
-
-        // [2] ブリリアンス(上げ側)の事前計算：低周波輝度マップ ＆ スライダー量pを反映したLUT
         let brilLow = null;
         let brilLut = null;
         const brilExp = exposure !== 0 ? Math.pow(2, exposure * 2.0) : 1.0;
-        if (brilliance > 0) {
-          brilLow = buildBrillianceLowFreq(data, width, height);
-          brilLut = buildBrillianceLut(Math.min(1, brilliance));
-        }
-
-        // [6] 明るさの事前計算：スライダー量を反映した輝度カーブ/色差係数のLUT
+        if (brilliance > 0 || shadows > 0) brilLow = buildBrillianceLowFreq(data, width, height);
+        if (brilliance > 0) brilLut = buildBrillianceLut(Math.min(1, brilliance));
+        const shadowLut = shadows !== 0 ? buildShadowLut(shadows) : null;
+        const highlightLut = highlights !== 0 ? buildToneLut(highlights > 0 ? HIGHLIGHT_MAX : HIGHLIGHT_MIN, Math.min(1, Math.abs(highlights))) : null;
         const brightLut = brightness !== 0 ? buildBrightnessLut(brightness) : null;
+        const blackPointLut = blackPoint !== 0 ? buildBlackPointLut(blackPoint) : null;
 
         for (let i = 0; i < len; i += 4) {
           let r = data[i] / 255;
           let g = data[i + 1] / 255;
           let b = data[i + 2] / 255;
 
-          // Luminance計算
           let luminance = 0.299 * r + 0.587 * g + 0.114 * b;
 
-          // [1] Exposure: Output = Input * pow(2, delta_EV)
           if (exposure !== 0) {
             const expFactor = Math.pow(2, exposure * 2.0);
             r *= expFactor;
@@ -1626,24 +1477,18 @@
             luminance *= expFactor;
           }
 
-          // [2] Brilliance: ユーザー様のトーンカーブ解析に基づく正確な挙動（中央固定の逆S字カーブ ＋ 彩度維持）
           if (brilliance !== 0) {
             if (brilliance < 0) {
-              // 【最低】スライダーを下げた時：中央を境界にして引き離す（重厚なコントラスト・S字）
               const bDown = Math.abs(brilliance);
               r = r + bDown * 1.5 * (r - 0.5) * Math.abs(r - 0.5);
               g = g + bDown * 1.5 * (g - 0.5) * Math.abs(g - 0.5);
               b = b + bDown * 1.5 * (b - 0.5) * Math.abs(b - 0.5);
             } else {
-              // 【最高】スライダーを上げた時：実機(iPhone)の画像比較から逆算した「ローカルトーンマッピング」
-              //   ベース層(ぼかし輝度)を中間へ圧縮＋暗部を持ち上げ、ディテール層は暗部・明部で増幅
-              //   → 全体が均一・明るくなるが、灰色化せず髪の流れ等のメリハリが立つ
               const rc = Math.min(1, Math.max(0, r));
               const gc = Math.min(1, Math.max(0, g));
               const bc = Math.min(1, Math.max(0, b));
               const yIn = 0.299 * rc + 0.587 * gc + 0.114 * bc;
 
-              // 低周波(ぼかし)輝度を、縮小グリッドから双線形補間で取得（露出補正後の値に換算）
               const px = i >> 2;
               const py = (px / width) | 0;
               const fx = Math.min(brilLow.gw - 1, Math.max(0, (px - py * width + 0.5) / brilLow.scale - 0.5));
@@ -1657,10 +1502,8 @@
                 (gr[y1 * gw2 + x0] * (1 - tx) + gr[y1 * gw2 + x1] * tx) * ty;
               const low = Math.min(1, Math.max(0, lowRaw * brilExp));
 
-              // ベース層：LUTでカーブ変換 ／ ディテール層(yIn - low)：LUTのゲインで増幅
               const li = Math.round(low * 1024);
               const yOut = brilLut.f[li] + brilLut.k[li] * (yIn - low);
-              // 色差は輝度変化に追従しつつ、ゲインの平方根で控えめに増減（実機の彩度変化に一致）
               const cs = brilLut.c[li];
               r = Math.min(1, Math.max(0, yOut + cs * (rc - yIn)));
               g = Math.min(1, Math.max(0, yOut + cs * (gc - yIn)));
@@ -1668,50 +1511,43 @@
             }
           }
 
-          // [3] Highlights: Output = Input + Highlights * pow(Luminance, 2) * (1.0 - Input)
           if (highlights !== 0) {
-            const highMask = Math.pow(Math.max(0, luminance), 2); // 明るい所だけに限定
-            if (highlights > 0) {
-              const hFactor = highlights * highMask;
-              r -= hFactor * r;
-              g -= hFactor * g;
-              b -= hFactor * b;
-            } else {
-              // 下げた時は、[4]シャドウ上げの挙動を明るい所だけに適用
-              const hVal = Math.abs(highlights);
-              const hFactor = hVal * highMask;
-              r += hFactor * (1.0 - r);
-              g += hFactor * (1.0 - g);
-              b += hFactor * (1.0 - b);
-            }
+            const rc = Math.min(1, Math.max(0, r));
+            const gc = Math.min(1, Math.max(0, g));
+            const bc = Math.min(1, Math.max(0, b));
+            const yIn = 0.299 * rc + 0.587 * gc + 0.114 * bc;
+            const hi = Math.round(yIn * 1024);
+            const yOut = highlightLut.f[hi];
+            const kc = highlightLut.k[hi];
+            r = Math.min(1, Math.max(0, yOut + kc * (rc - yIn)));
+            g = Math.min(1, Math.max(0, yOut + kc * (gc - yIn)));
+            b = Math.min(1, Math.max(0, yOut + kc * (bc - yIn)));
           }
 
-          // [4] Shadows: Output = Input + Shadows * pow((1.0 - Luminance), 2) * Input
           if (shadows !== 0) {
-            const darkMask = Math.pow(Math.max(0, 1.0 - luminance), 3); // 暗い所に限定
-            if (shadows > 0) {
-              const addVal = shadows * darkMask * 0.6;
-              r += addVal;
-              g += addVal;
-              b += addVal;
-            } else {
-              const dropVal = Math.abs(shadows) * darkMask * 0.85;
-              r -= dropVal;
-              g -= dropVal;
-              b -= dropVal;
+            const rc = Math.min(1, Math.max(0, r));
+            const gc = Math.min(1, Math.max(0, g));
+            const bc = Math.min(1, Math.max(0, b));
+            const yIn = 0.299 * rc + 0.587 * gc + 0.114 * bc;
+            const si = Math.round(yIn * 1024);
+            let yOut = shadowLut.f[si];
+            if (shadowLut.local) {
+              const yRaw = (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) / 255;
+              const lowRaw = sampleLowFreq(brilLow, i >> 2, width);
+              yOut += shadowLut.b[si] * (lowRaw - yRaw) * brilExp;
             }
+            const kc = shadowLut.k[si];
+            r = Math.min(1, Math.max(0, yOut + kc * (rc - yIn)));
+            g = Math.min(1, Math.max(0, yOut + kc * (gc - yIn)));
+            b = Math.min(1, Math.max(0, yOut + kc * (bc - yIn)));
           }
 
-          // [5] Contrast: Output = (Input - 0.5) * Contrast_Scale + 0.5
           if (contrastVal !== 0) {
             r = (r - 0.5) * contrastScale + 0.5;
             g = (g - 0.5) * contrastScale + 0.5;
             b = (b - 0.5) * contrastScale + 0.5;
           }
 
-          // [6] Brightness: 実機(iPhone)の MAX/MIN 画像比較から逆算
-          //   輝度Yにだけトーンカーブ(F)をかけ、色差(R-Y, G-Y, B-Y)は輝度に応じた係数(K)で増減する
-          //   → 明るくすると彩度が下がり、暗くすると彩度が上がる実機の挙動を再現
           if (brightness !== 0) {
             const rc = Math.min(1, Math.max(0, r));
             const gc = Math.min(1, Math.max(0, g));
@@ -1725,72 +1561,10 @@
             b = Math.min(1, Math.max(0, yOut + kc * (bc - yIn)));
           }
 
-          // [7] Black Point: Output = (Input - BlackPoint_Value) / (1.0 - BlackPoint_Value)
           if (blackPoint !== 0) {
-            if (blackPoint > 0) {
-              const bp = blackPoint * 0.15; // 領域を狭めて極めて暗い部分だけに限定
-              r = Math.max(0, r - bp) / Math.max(0.001, 1.0 - bp);
-              g = Math.max(0, g - bp) / Math.max(0.001, 1.0 - bp);
-              b = Math.max(0, b - bp) / Math.max(0.001, 1.0 - bp);
-            } else {
-              // 下げた時は暗い部分を灰色化（リフト）
-              const lift =
-                Math.abs(blackPoint) * 0.2 * Math.max(0, 1.0 - luminance);
-              r += lift;
-              g += lift;
-              b += lift;
-            }
-          }
-
-          // [8] Saturation & [9] Natural Saturation (Vibrance)
-          if (saturation !== 0 || vibrance !== 0) {
-            const currentY = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-            let totalSatScale = saturationScale;
-            if (vibrance !== 0) {
-              const maxRGB = Math.max(r, g, b);
-              const minRGB = Math.min(r, g, b);
-              const currentSat = maxRGB === 0 ? 0 : (maxRGB - minRGB) / maxRGB;
-              const skinMask = r > g && g > b && r - b > 0.1 ? 0.5 : 1.0;
-              const deltaS = (1.0 - currentSat) * vibrance * 1.5 * skinMask;
-              totalSatScale += deltaS;
-            }
-            r = currentY + (r - currentY) * totalSatScale;
-            g = currentY + (g - currentY) * totalSatScale;
-            b = currentY + (b - currentY) * totalSatScale;
-          }
-
-          // [10] Warmth (Color Temperature) Matrix
-          if (warmth !== 0) {
-            r *= 1.0 + 0.15 * warmth;
-            g *= 1.0 + 0.05 * warmth;
-            b *= 1.0 - 0.15 * warmth;
-          }
-
-          // [11] Tint Matrix
-          if (tint !== 0) {
-            r *= 1.0 + 0.1 * tint;
-            g *= 1.0 - 0.1 * tint;
-            b *= 1.0 + 0.1 * tint;
-          }
-
-          // [12] Sharpness (Unsharp Mask)
-          if (isFullResolution && sharpness > 0 && blurData) {
-            const br = blurData[i] / 255;
-            const bg = blurData[i + 1] / 255;
-            const bb = blurData[i + 2] / 255;
-            r = r + sharpness * (r - br);
-            g = g + sharpness * (g - bg);
-            b = b + sharpness * (b - bb);
-          }
-
-          // [13] Clarity / Definition
-          if (isFullResolution && definition > 0 && wideBlurData) {
-            const wr = wideBlurData[i] / 255;
-            const wg = wideBlurData[i + 1] / 255;
-            const wb = wideBlurData[i + 2] / 255;
-            r = r + definition * 0.8 * (r - wr);
-            g = g + definition * 0.8 * (g - wg);
-            b = b + definition * 0.8 * (b - wb);
+            r = blackPointLut[Math.round(Math.min(1, Math.max(0, r)) * 1024)];
+            g = blackPointLut[Math.round(Math.min(1, Math.max(0, g)) * 1024)];
+            b = blackPointLut[Math.round(Math.min(1, Math.max(0, b)) * 1024)];
           }
 
           data[i] = Math.min(255, Math.max(0, r * 255));
@@ -1801,28 +1575,45 @@
         ctx.putImageData(imgData, 0, 0);
       }
 
-      // ==========================================
-      // [6] 明るさ(Brightness)用ヘルパー
-      //  実機画像(元画像 vs 明るさMAX / MIN)から逆算した変換テーブル
-      //  Y_out = F(Y),  out = Y_out + K(Y) * (in - Y)     Y: 輝度(0.299R+0.587G+0.114B)
-      //  F: 輝度カーブ（MAX: 暗部を持ち上げ白は固定 / MIN: 輝度0.4以下を黒に潰し線形に引き伸ばす）
-      //  K: 色差の増減率（MAX: 明部ほど彩度が下がる / MIN: 彩度が上がる）
-      //  スライダー値は「恒等変換 → MAX(MIN)」への補間量として F, K に反映される
-      // ==========================================
+      // ヘルパー群
+      const BLACKPOINT_LEVELS = [-100, -75, -50, -25, 0, 25, 50, 75, 100];
+      const BLACKPOINT_F = [
+        [0.243, 0.247, 0.254, 0.263, 0.274, 0.289, 0.305, 0.323, 0.343, 0.364, 0.386, 0.41, 0.434, 0.459, 0.485, 0.512, 0.538, 0.567, 0.594, 0.621, 0.649, 0.679, 0.707, 0.734, 0.765, 0.793, 0.823, 0.851, 0.883, 0.91, 0.942, 0.968, 1],
+        [0.212, 0.216, 0.224, 0.234, 0.248, 0.263, 0.282, 0.301, 0.323, 0.346, 0.371, 0.396, 0.422, 0.447, 0.474, 0.501, 0.529, 0.559, 0.586, 0.614, 0.645, 0.673, 0.703, 0.731, 0.762, 0.79, 0.82, 0.851, 0.879, 0.91, 0.941, 0.968, 1],
+        [0.173, 0.178, 0.188, 0.201, 0.217, 0.234, 0.256, 0.277, 0.301, 0.326, 0.352, 0.379, 0.406, 0.433, 0.462, 0.492, 0.52, 0.55, 0.578, 0.609, 0.637, 0.669, 0.697, 0.727, 0.758, 0.789, 0.816, 0.848, 0.879, 0.91, 0.938, 0.968, 1],
+        [0.118, 0.126, 0.141, 0.158, 0.178, 0.199, 0.225, 0.251, 0.278, 0.305, 0.333, 0.363, 0.391, 0.422, 0.449, 0.481, 0.512, 0.54, 0.57, 0.601, 0.633, 0.662, 0.692, 0.723, 0.754, 0.785, 0.816, 0.847, 0.875, 0.906, 0.938, 0.968, 1],
+        [0, 0.031, 0.062, 0.094, 0.125, 0.156, 0.188, 0.219, 0.25, 0.281, 0.312, 0.344, 0.375, 0.406, 0.438, 0.469, 0.5, 0.531, 0.562, 0.594, 0.625, 0.656, 0.688, 0.719, 0.75, 0.781, 0.812, 0.844, 0.875, 0.906, 0.938, 0.969, 1],
+        [0, 0, 0, 0.001, 0.055, 0.106, 0.15, 0.187, 0.225, 0.258, 0.293, 0.328, 0.36, 0.394, 0.426, 0.457, 0.492, 0.524, 0.555, 0.586, 0.621, 0.653, 0.684, 0.715, 0.747, 0.777, 0.809, 0.844, 0.875, 0.906, 0.938, 0.968, 1],
+        [0, 0, 0, 0, 0, 0, 0.056, 0.126, 0.178, 0.22, 0.262, 0.3, 0.338, 0.373, 0.409, 0.443, 0.476, 0.512, 0.545, 0.578, 0.613, 0.646, 0.676, 0.711, 0.743, 0.773, 0.809, 0.84, 0.871, 0.902, 0.938, 0.968, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0.029, 0.123, 0.182, 0.233, 0.275, 0.318, 0.355, 0.393, 0.429, 0.465, 0.501, 0.535, 0.57, 0.605, 0.637, 0.672, 0.705, 0.739, 0.771, 0.805, 0.836, 0.871, 0.902, 0.934, 0.968, 1],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0.023, 0.127, 0.194, 0.246, 0.293, 0.335, 0.376, 0.414, 0.454, 0.49, 0.526, 0.561, 0.597, 0.633, 0.665, 0.699, 0.734, 0.768, 0.801, 0.835, 0.867, 0.902, 0.934, 0.967, 1],
+      ];
+
+      function buildBlackPointLut(blackPoint) {
+        const s = Math.min(100, Math.max(-100, blackPoint * 100));
+        let li = 0;
+        while (li < BLACKPOINT_LEVELS.length - 2 && s > BLACKPOINT_LEVELS[li + 1]) li++;
+        const t = (s - BLACKPOINT_LEVELS[li]) / (BLACKPOINT_LEVELS[li + 1] - BLACKPOINT_LEVELS[li]);
+        const F = BLACKPOINT_F[li].map((v, j) => v + (BLACKPOINT_F[li + 1][j] - v) * t);
+        const n = 1024;
+        const lut = new Float32Array(n + 1);
+        for (let i = 0; i <= n; i++) lut[i] = lerpUniform(F, i / n);
+        return lut;
+      }
+
       const BRIGHT_MAX = {
         fx: [0.0, 0.039, 0.322, 0.463, 0.592, 0.714, 0.831, 0.945, 1.0],
         fy: [0.0, 0.068, 0.453, 0.627, 0.767, 0.874, 0.952, 0.995, 1.0],
-        kx: [0.0, 0.021, 0.104, 0.521, 0.854, 0.979, 1.0],
-        ky: [1.2, 1.2, 1.02, 0.74, 0.54, 0.34, 0.34],
+        kx: [0.0, 0.021, 0.812, 0.979, 1.0],
+        ky: [1.3, 1.3, 0.7, 0.37, 0.37],
       };
       const BRIGHT_MIN = {
         fx: [0.0, 0.404, 0.498, 0.678, 0.835, 1.0],
         fy: [0.0, 0.007, 0.155, 0.426, 0.689, 0.995],
-        kx: [0.0, 0.021, 0.104, 0.146, 0.396, 0.729, 0.854, 0.979, 1.0],
-        ky: [0.52, 0.52, 0.4, 0.44, 1.28, 1.28, 1.42, 1.42, 1.42],
+        kx: [0.0, 0.021, 0.146, 0.396, 0.521, 0.604, 0.771, 0.896, 0.979, 1.0],
+        ky: [0.55, 0.55, 0.47, 1.37, 1.45, 1.7, 1.62, 1.72, 1.62, 1.62],
       };
 
-      // 区分線形補間
       function interpKnots(xs, ys, v) {
         let s = 0;
         while (s < xs.length - 2 && v > xs[s + 1]) s++;
@@ -1830,31 +1621,115 @@
         return ys[s] + (ys[s + 1] - ys[s]) * Math.min(1, Math.max(0, t));
       }
 
-      function buildBrightnessLut(brightness) {
-        const t = brightness > 0 ? BRIGHT_MAX : BRIGHT_MIN;
-        const p = Math.min(1, Math.abs(brightness)); // 0〜1
+      function buildToneLut(t, p) {
         const n = 1024;
         const f = new Float32Array(n + 1);
         const k = new Float32Array(n + 1);
         for (let i = 0; i <= n; i++) {
           const y = i / n;
-          f[i] = y + p * (interpKnots(t.fx, t.fy, y) - y); // p=0で恒等、p=1で実機MAX/MIN
+          f[i] = y + p * (interpKnots(t.fx, t.fy, y) - y);
           k[i] = 1 + p * (interpKnots(t.kx, t.ky, y) - 1);
         }
         return { f, k };
       }
 
-      // ==========================================
-      // [2] ブリリアンス(上げ側)用ヘルパー
-      //  実機画像(元画像 vs ブリリアンスMAX)の比較から逆算した変換テーブル
-      //  out = F(L) + K(L) * (in - L)   L: 低周波(ぼかし)輝度
-      //  F: ベース層カーブ（暗部持ち上げ・明部は中間へ圧縮）  K: ディテール増幅率（暗部・明部で増幅、中間は抑制）
-      //  スライダー値pは「恒等変換 → MAX」への補間量として F, K に反映される
-      // ==========================================
-      const BRIL_SIGMA_FRAC = 0.03; // ぼかし半径（画像の長辺に対する比率）
+      function buildBrightnessLut(brightness) {
+        return buildToneLut(brightness > 0 ? BRIGHT_MAX : BRIGHT_MIN, Math.min(1, Math.abs(brightness)));
+      }
+
+      const SHADOW_LEVELS = [-100, -75, -50, -25, 0, 25, 50, 75, 100];
+      const SHADOW_F = [
+        [0, 0, 0, 0, 0.092, 0.222, 0.314, 0.395, 0.47, 0.543, 0.613, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+        [0, 0, 0, 0.002, 0.148, 0.248, 0.33, 0.406, 0.477, 0.547, 0.617, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+        [0, 0.019, 0.056, 0.099, 0.188, 0.271, 0.346, 0.417, 0.484, 0.552, 0.619, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+        [0.004, 0.048, 0.105, 0.16, 0.229, 0.297, 0.363, 0.43, 0.496, 0.559, 0.622, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+        [0, 0.062, 0.125, 0.188, 0.25, 0.312, 0.375, 0.438, 0.5, 0.562, 0.625, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+        [0.008, 0.068, 0.135, 0.2, 0.265, 0.329, 0.391, 0.451, 0.509, 0.567, 0.627, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+        [0.008, 0.081, 0.159, 0.233, 0.302, 0.37, 0.427, 0.485, 0.534, 0.581, 0.632, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+        [0.012, 0.098, 0.188, 0.282, 0.362, 0.436, 0.492, 0.541, 0.574, 0.605, 0.64, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+        [0.016, 0.117, 0.227, 0.341, 0.435, 0.52, 0.572, 0.614, 0.629, 0.635, 0.65, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+      ];
+      const SHADOW_B = [
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [-0.01, -0.01, -0.01, -0.03, -0.03, -0.01, 0, 0, 0],
+        [-0.01, -0.02, -0.06, -0.11, -0.11, -0.05, -0.02, -0.01, 0],
+        [-0.01, -0.03, -0.14, -0.25, -0.25, -0.11, -0.05, -0.02, 0],
+        [-0.02, -0.06, -0.24, -0.42, -0.43, -0.2, -0.08, -0.03, 0],
+      ];
+      const SHADOW_K = [
+        [0.15, 0.71, 1.36, 1.24, 1.21, 1.15, 1.1, 1.02, 0.95],
+        [0.2, 0.86, 1.31, 1.2, 1.15, 1.1, 1.06, 1.01, 0.97],
+        [1.35, 1.24, 1.2, 1.15, 1.09, 1.06, 1.04, 1.01, 0.97],
+        [1.12, 1.11, 1.06, 1.04, 1.02, 1, 1, 1, 0.97],
+        [1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1.1, 1.02, 1, 0.97, 0.97, 0.97, 0.97, 0.97, 0.97],
+        [1.3, 1.12, 1.04, 1, 0.97, 0.97, 0.97, 0.97, 1],
+        [1.55, 1.29, 1.15, 1.05, 0.99, 0.97, 0.97, 0.97, 1],
+        [1.82, 1.47, 1.29, 1.19, 1.06, 0.97, 0.97, 0.97, 1],
+      ];
+
+      function lerpUniform(arr, v) {
+        const pos = Math.min(1, Math.max(0, v)) * (arr.length - 1);
+        const i = Math.min(arr.length - 2, Math.floor(pos));
+        return arr[i] + (arr[i + 1] - arr[i]) * (pos - i);
+      }
+
+      function buildShadowLut(shadows) {
+        const s = Math.min(100, Math.max(-100, shadows * 100));
+        let li = 0;
+        while (li < SHADOW_LEVELS.length - 2 && s > SHADOW_LEVELS[li + 1]) li++;
+        const t = (s - SHADOW_LEVELS[li]) / (SHADOW_LEVELS[li + 1] - SHADOW_LEVELS[li]);
+        const mix = (tbl) => tbl[li].map((v, j) => v + (tbl[li + 1][j] - v) * t);
+        const F = mix(SHADOW_F), B = mix(SHADOW_B), K = mix(SHADOW_K);
+        const n = 1024;
+        const f = new Float32Array(n + 1);
+        const b = new Float32Array(n + 1);
+        const k = new Float32Array(n + 1);
+        for (let i = 0; i <= n; i++) {
+          const y = i / n;
+          f[i] = lerpUniform(F, y);
+          b[i] = lerpUniform(B, y);
+          k[i] = lerpUniform(K, y);
+        }
+        return { f, b, k, local: s > 0 };
+      }
+
+      function sampleLowFreq(low, px, width) {
+        const py = (px / width) | 0;
+        const fx = Math.min(low.gw - 1, Math.max(0, (px - py * width + 0.5) / low.scale - 0.5));
+        const fy = Math.min(low.gh - 1, Math.max(0, (py + 0.5) / low.scale - 0.5));
+        const x0 = fx | 0, y0 = fy | 0;
+        const x1 = Math.min(low.gw - 1, x0 + 1), y1 = Math.min(low.gh - 1, y0 + 1);
+        const tx = fx - x0, ty = fy - y0;
+        const g = low.grid, w = low.gw;
+        return (
+          (g[y0 * w + x0] * (1 - tx) + g[y0 * w + x1] * tx) * (1 - ty) +
+          (g[y1 * w + x0] * (1 - tx) + g[y1 * w + x1] * tx) * ty
+        );
+      }
+
+      const HIGHLIGHT_MAX = {
+        fx: [0.0, 0.318, 0.694, 0.792, 0.878, 0.957, 1.0],
+        fy: [0.0, 0.325, 0.741, 0.835, 0.895, 0.965, 1.0],
+        kx: [0.0, 0.021, 0.812, 0.938, 0.979, 1.0],
+        ky: [1.0, 1.0, 0.57, 0.3, 0.17, 0.17],
+      };
+      const HIGHLIGHT_MIN = {
+        fx: [0.0, 0.255, 0.455, 0.749, 0.82, 0.878, 0.929, 0.973, 0.988, 1.0],
+        fy: [0.0, 0.251, 0.421, 0.624, 0.693, 0.779, 0.883, 0.991, 1.0, 1.0],
+        kx: [0.0, 0.021, 0.188, 0.479, 0.729, 0.812, 0.896, 0.938, 0.979, 1.0],
+        ky: [1.1, 1.1, 0.97, 1.17, 1.62, 1.95, 2.45, 2.77, 2.57, 2.57],
+      };
+
+      const BRIL_SIGMA_FRAC = 0.03;
       const BRIL_KNOT_L = [0.0, 0.1, 0.2, 0.28, 0.33, 0.38, 0.43, 0.475, 0.525, 0.575, 0.625, 0.68, 0.73, 0.775, 0.825, 0.87, 0.913, 0.96, 1.0];
-      const BRIL_KNOT_F = [0.0, 0.165, 0.3, 0.405, 0.445, 0.485, 0.53, 0.57, 0.612, 0.65, 0.665, 0.685, 0.695, 0.7, 0.72, 0.74, 0.785, 0.91, 1.0];
-      const BRIL_KNOT_K = [1.4, 1.42, 1.45, 1.38, 1.24, 1.11, 1.0, 0.88, 0.68, 0.58, 0.64, 0.78, 0.95, 1.2, 1.47, 1.95, 2.4, 2.3, 1.5];
+      const BRIL_KNOT_F = [0.0, 0.161, 0.301, 0.406, 0.446, 0.488, 0.534, 0.567, 0.61, 0.653, 0.658, 0.681, 0.69, 0.69, 0.71, 0.73, 0.777, 0.91, 1.0];
+      const BRIL_KNOT_K = [1.4, 1.4, 1.4, 1.37, 1.23, 1.11, 1.03, 0.88, 0.68, 0.58, 0.66, 0.82, 0.99, 1.22, 1.52, 2.0, 2.52, 2.3, 1.5];
+      const BRIL_KNOT_C = [1.37, 1.39, 1.4, 1.42, 1.34, 1.29, 1.21, 1.12, 1.05, 1.05, 1.05, 1.03, 1.06, 1.17, 1.37, 1.69, 2.33, 2.0, 1.0];
 
       function buildBrillianceLut(p) {
         const n = 1024;
@@ -1868,14 +1743,14 @@
           const t = (L - BRIL_KNOT_L[seg]) / (BRIL_KNOT_L[seg + 1] - BRIL_KNOT_L[seg]);
           const F = BRIL_KNOT_F[seg] + (BRIL_KNOT_F[seg + 1] - BRIL_KNOT_F[seg]) * t;
           const K = BRIL_KNOT_K[seg] + (BRIL_KNOT_K[seg + 1] - BRIL_KNOT_K[seg]) * t;
-          f[i] = L + p * (F - L); // p=0で恒等、p=1で実機MAX
+          const C = BRIL_KNOT_C[seg] + (BRIL_KNOT_C[seg + 1] - BRIL_KNOT_C[seg]) * t;
+          f[i] = L + p * (F - L);
           k[i] = 1 + p * (K - 1);
-          c[i] = Math.sqrt(k[i]);
+          c[i] = 1 + p * (C - 1);
         }
         return { f, k, c };
       }
 
-      // 縮小(ブロック平均) → 3回ボックスブラー(≒ガウシアン) したグリッドを返す。解像度が上がっても処理量はほぼ一定。
       function buildBrillianceLowFreq(data, width, height) {
         const m = Math.max(width, height);
         const scale = Math.max(1, Math.ceil(m / 200));
@@ -1904,7 +1779,6 @@
         return { grid, gw, gh, scale };
       }
 
-      // 端を複製する移動平均（1ライン分）
       function boxBlurLine(src, dst, off, stride, n, r) {
         const inv = 1 / (2 * r + 1);
         let sum = 0;
@@ -1913,74 +1787,6 @@
           dst[off + i * stride] = sum * inv;
           sum += src[off + Math.min(n - 1, i + r + 1) * stride] - src[off + Math.max(0, i - r) * stride];
         }
-      }
-
-      function createGaussianBlurData(data, width, height, radius) {
-        const copy = new Uint8ClampedArray(data);
-        const w = width,
-          h = height;
-        for (let y = 1; y < h - 1; y++) {
-          for (let x = 1; x < w - 1; x++) {
-            const idx = (y * w + x) * 4;
-            for (let c = 0; c < 3; c++) {
-              const avg =
-                (copy[((y - 1) * w + x) * 4 + c] +
-                  copy[((y + 1) * w + x) * 4 + c] +
-                  copy[(y * w + (x - 1)) * 4 + c] +
-                  copy[(y * w + (x + 1)) * 4 + c] +
-                  copy[idx + c] * 4) /
-                8;
-              copy[idx + c] = avg;
-            }
-          }
-        }
-        return copy;
-      }
-
-      function applyNoiseReductionFilter(data, width, height, strength) {
-        const copy = new Uint8ClampedArray(data);
-        const w = width,
-          h = height;
-        for (let y = 1; y < h - 1; y += 2) {
-          for (let x = 1; x < w - 1; x += 2) {
-            const idx = (y * w + x) * 4;
-            for (let c = 0; c < 3; c++) {
-              const avg =
-                (copy[((y - 1) * w + x) * 4 + c] +
-                  copy[((y + 1) * w + x) * 4 + c] +
-                  copy[(y * w + (x - 1)) * 4 + c] +
-                  copy[(y * w + (x + 1)) * 4 + c]) /
-                4;
-              data[idx + c] =
-                data[idx + c] * (1 - strength * 0.5) + avg * (strength * 0.5);
-            }
-          }
-        }
-      }
-
-      // [15] Vignette
-      function applyVignette(ctx, size, intensity) {
-        if (intensity <= 0) return;
-        ctx.save();
-        const centerX = size / 2;
-        const centerY = size / 2;
-        const maxRadius = Math.sqrt(centerX * centerX + centerY * centerY);
-
-        const gradient = ctx.createRadialGradient(
-          centerX,
-          centerY,
-          maxRadius * 0.3,
-          centerX,
-          centerY,
-          maxRadius,
-        );
-        const alpha = (intensity / 100) * 0.75;
-        gradient.addColorStop(0, "rgba(0, 0, 0, 0)");
-        gradient.addColorStop(1, `rgba(0, 0, 0, ${alpha})`);
-
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, size, size);
-        ctx.restore();
       }
 
       function drawInsideBorders(
