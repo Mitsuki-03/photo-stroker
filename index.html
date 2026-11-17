@@ -860,7 +860,7 @@
                   />
                 </div>
                 <!-- [8]〜[15] 未実装のためコメントアウト -->
-                <!-- <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /> -->
+                <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
               </div>
             </div>
 
@@ -1017,7 +1017,7 @@
       btnResetRotation.addEventListener("click", () => {
         rotationSlider.value = "0";
         rotationVal.textContent = "0.0°";
-        handleSettingChange(true);
+        handleSettingChange(true, ["rotation"]);
       });
 
       [canvasSizeInput, targetScopeSelect, borderAlignSelect].forEach((el) => {
@@ -1050,7 +1050,7 @@
           if (slider) slider.value = 0;
           if (valSpan) valSpan.textContent = "0";
         });
-        handleSettingChange(true);
+        handleSettingChange(true, ["adjustments"]);
       });
 
       btnDeleteSelected.addEventListener("click", () => {
@@ -1159,45 +1159,45 @@
         };
       }
 
-      function handleSettingChange(immediate = true) {
+      // 直前のフォーム状態（変更された項目だけを検出するための基準）
+      let lastFormConfig = collectCurrentFormConfig();
+
+      // 「変更された項目」だけを対象画像に反映する。
+      // 触っていない項目（個別に設定した傾き・ズーム・色調など）は上書きしない。
+      function applyFormDiff(targetCfg, cur, force) {
+        const prev = lastFormConfig;
+        Object.keys(cur).forEach((key) => {
+          if (key === "adjustments") return;
+          if (force.includes(key) || cur[key] !== prev[key]) {
+            targetCfg[key] = cur[key];
+          }
+        });
+        const adj = { ...defaultAdjustments, ...(targetCfg.adjustments || {}) };
+        adjustmentKeys.forEach((k) => {
+          if (force.includes("adjustments") || cur.adjustments[k] !== prev.adjustments[k]) {
+            adj[k] = cur.adjustments[k];
+          }
+        });
+        targetCfg.adjustments = adj;
+      }
+
+      function handleSettingChange(immediate = true, force = []) {
         const currentConfig = collectCurrentFormConfig();
 
         if (selectedImageIds.length === 0) {
-          const prevZoom = globalSettings.zoom;
-          const prevZoomX = globalSettings.zoomX;
-          const prevZoomY = globalSettings.zoomY;
-          globalSettings = {
-            ...JSON.parse(JSON.stringify(currentConfig)),
-            zoom: prevZoom,
-            zoomX: prevZoomX,
-            zoomY: prevZoomY,
-          };
+          applyFormDiff(globalSettings, currentConfig, force);
           uploadedFiles.forEach((item) => {
-            const z = item.config.zoom ?? 0;
-            const zx = item.config.zoomX ?? 0.5;
-            const zy = item.config.zoomY ?? 0.5;
-            item.config = {
-              ...JSON.parse(JSON.stringify(currentConfig)),
-              zoom: z,
-              zoomX: zx,
-              zoomY: zy,
-            };
+            applyFormDiff(item.config, currentConfig, force);
           });
         } else {
           uploadedFiles.forEach((item) => {
             if (selectedImageIds.includes(item.id)) {
-              const z = item.config.zoom ?? 0;
-              const zx = item.config.zoomX ?? 0.5;
-              const zy = item.config.zoomY ?? 0.5;
-              item.config = {
-                ...JSON.parse(JSON.stringify(currentConfig)),
-                zoom: z,
-                zoomX: zx,
-                zoomY: zy,
-              };
+              applyFormDiff(item.config, currentConfig, force);
             }
           });
         }
+
+        lastFormConfig = currentConfig;
 
         if (immediate) {
           renderAllPreviews();
@@ -1234,6 +1234,7 @@
             if (valSpan) valSpan.textContent = val;
           });
         }
+        lastFormConfig = collectCurrentFormConfig();
       }
 
       function updateUIForSelection() {
@@ -1446,6 +1447,8 @@
               const val = parseFloat(rotSliderEl.value) || 0;
               item.config.rotation = val;
               if (rotValEl) rotValEl.textContent = val.toFixed(1) + "°";
+              if (selectedImageIds.length === 1 && selectedImageIds[0] === item.id)
+                syncFormWithConfig(item.config);
 
               const updatedCanvas = generateCanvas(item, false);
               if (imgEl)
@@ -1461,6 +1464,8 @@
             rotResetEl.addEventListener("click", (ev) => {
               ev.stopPropagation();
               item.config.rotation = 0.0;
+              if (selectedImageIds.length === 1 && selectedImageIds[0] === item.id)
+                syncFormWithConfig(item.config);
               renderAllPreviews();
             });
           }
