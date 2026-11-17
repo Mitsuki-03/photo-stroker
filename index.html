@@ -614,45 +614,6 @@
               </div>
             </div>
 
-            <!-- 傾き補正 (回転) 設定 -->
-            <div
-              class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200"
-            >
-              <div
-                class="flex justify-between items-center border-b border-slate-200 pb-1"
-              >
-                <h3 class="text-xs font-bold text-slate-800">
-                  画像の傾き補正 (回転)
-                </h3>
-                <span id="rotation-val" class="text-xs font-bold text-blue-600"
-                  >0.0°</span
-                >
-              </div>
-              <div class="space-y-1">
-                <div class="flex justify-between text-[11px] text-slate-600">
-                  <span>角度 (-45° 〜 +45°)</span>
-                  <button
-                    id="btn-reset-rotation"
-                    class="text-blue-600 hover:underline"
-                  >
-                    リセット
-                  </button>
-                </div>
-                <input
-                  type="range"
-                  id="rotation-slider"
-                  min="-45"
-                  max="45"
-                  step="0.1"
-                  value="0"
-                  class="w-full accent-blue-600"
-                />
-                <p class="text-[10px] text-slate-500 pt-1">
-                  ※キャンバス枠内で回転し、はみ出た部分は自動でマスクされます。
-                </p>
-              </div>
-            </div>
-
             <!-- フチ設定 -->
             <div
               class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200"
@@ -952,10 +913,6 @@
       const targetScopeSelect = document.getElementById("target-scope");
       const borderAlignSelect = document.getElementById("border-align");
 
-      const rotationSlider = document.getElementById("rotation-slider");
-      const rotationVal = document.getElementById("rotation-val");
-      const btnResetRotation = document.getElementById("btn-reset-rotation");
-
       const adjustmentKeys = [
         "exposure",
         "brilliance",
@@ -1003,21 +960,6 @@
       innerSizeInput.addEventListener("input", () => {
         innerSizeVal.textContent = innerSizeInput.value + "px";
         handleSettingChange(false);
-      });
-
-      rotationSlider.addEventListener("input", () => {
-        const val = parseFloat(rotationSlider.value) || 0;
-        rotationVal.textContent = val.toFixed(1) + "°";
-        handleSettingChange(false);
-      });
-      rotationSlider.addEventListener("change", () => {
-        handleSettingChange(true);
-      });
-
-      btnResetRotation.addEventListener("click", () => {
-        rotationSlider.value = "0";
-        rotationVal.textContent = "0.0°";
-        handleSettingChange(true, ["rotation"]);
       });
 
       [canvasSizeInput, targetScopeSelect, borderAlignSelect].forEach((el) => {
@@ -1154,7 +1096,6 @@
           innerSize: parseInt(innerSizeInput.value) || 0,
           targetScope: targetScopeSelect.value,
           borderAlign: borderAlignSelect.value,
-          rotation: parseFloat(rotationSlider.value) || 0,
           adjustments: adj,
         };
       }
@@ -1174,7 +1115,10 @@
         });
         const adj = { ...defaultAdjustments, ...(targetCfg.adjustments || {}) };
         adjustmentKeys.forEach((k) => {
-          if (force.includes("adjustments") || cur.adjustments[k] !== prev.adjustments[k]) {
+          if (
+            force.includes("adjustments") ||
+            cur.adjustments[k] !== prev.adjustments[k]
+          ) {
             adj[k] = cur.adjustments[k];
           }
         });
@@ -1220,10 +1164,6 @@
         innerSizeVal.textContent = config.innerSize + "px";
         targetScopeSelect.value = config.targetScope;
         borderAlignSelect.value = config.borderAlign;
-
-        const rot = config.rotation !== undefined ? config.rotation : 0;
-        rotationSlider.value = rot;
-        rotationVal.textContent = rot.toFixed(1) + "°";
 
         if (config.adjustments) {
           adjustmentKeys.forEach((key) => {
@@ -1447,8 +1387,6 @@
               const val = parseFloat(rotSliderEl.value) || 0;
               item.config.rotation = val;
               if (rotValEl) rotValEl.textContent = val.toFixed(1) + "°";
-              if (selectedImageIds.length === 1 && selectedImageIds[0] === item.id)
-                syncFormWithConfig(item.config);
 
               const updatedCanvas = generateCanvas(item, false);
               if (imgEl)
@@ -1464,8 +1402,6 @@
             rotResetEl.addEventListener("click", (ev) => {
               ev.stopPropagation();
               item.config.rotation = 0.0;
-              if (selectedImageIds.length === 1 && selectedImageIds[0] === item.id)
-                syncFormWithConfig(item.config);
               renderAllPreviews();
             });
           }
