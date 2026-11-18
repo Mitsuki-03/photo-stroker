@@ -474,6 +474,10 @@
         accent-color: #2563eb;
         cursor: pointer;
       }
+
+      .scrollbar-gutter-stable {
+        scrollbar-gutter: stable;
+      }
     </style>
   </head>
   <body class="bg-slate-100 text-slate-800 min-h-screen p-4 md:p-8">
@@ -820,7 +824,35 @@
                     class="w-full"
                   />
                 </div>
-                <!-- [8]〜[15] 未実装のためコメントアウト -->
+                <div class="space-y-1">
+                  <div class="flex justify-between font-medium text-slate-700">
+                    <span>[8] 彩度 (Saturation)</span
+                    ><span id="val-saturation">0</span>
+                  </div>
+                  <input
+                    type="range"
+                    id="adj-saturation"
+                    min="-100"
+                    max="100"
+                    value="0"
+                    class="w-full"
+                  />
+                </div>
+                <div class="space-y-1">
+                  <div class="flex justify-between font-medium text-slate-700">
+                    <span>[9] 自然な彩度 (Vibrance)</span
+                    ><span id="val-vibrance">0</span>
+                  </div>
+                  <input
+                    type="range"
+                    id="adj-vibrance"
+                    min="-100"
+                    max="100"
+                    value="0"
+                    class="w-full"
+                  />
+                </div>
+                <!-- [10]〜[15] 未実装のためコメントアウト -->
                 <!-- <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /> -->
               </div>
             </div>
@@ -854,7 +886,7 @@
             <!-- プレビューグリッド -->
             <div
               id="preview-container"
-              class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1"
+              class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1 scrollbar-gutter-stable"
             >
               <div
                 id="empty-state"
@@ -921,6 +953,8 @@
         "contrast",
         "brightness",
         "blackPoint",
+        "saturation",
+        "vibrance",
       ];
 
       const defaultAdjustments = {
@@ -931,6 +965,8 @@
         contrast: 0,
         brightness: 0,
         blackPoint: 0,
+        saturation: 0,
+        vibrance: 0,
       };
 
       let globalSettings = {
@@ -1204,24 +1240,45 @@
         }
       }
 
+      // 先頭カード（画像＋ズーム・傾きスライダー＋保存行）がスクロールなしで全部見えるよう、プレビュー領域を下方向へ広げる
+      // （画面幅によってカードの高さが変わるため、描画後と画面サイズ変更時に実測して max-height を決める）
+      function fitPreviewHeight() {
+        previewContainer.style.maxHeight = "";
+        const first = previewContainer.querySelector(".image-card");
+        if (!first) return;
+        const cs = getComputedStyle(previewContainer);
+        const need =
+          first.offsetHeight +
+          parseFloat(cs.paddingTop) +
+          parseFloat(cs.paddingBottom) +
+          8;
+        if (need > (parseFloat(cs.maxHeight) || 0)) {
+          previewContainer.style.maxHeight = need + "px";
+        }
+      }
+      window.addEventListener("resize", () => {
+        if (uploadedFiles.length > 0) fitPreviewHeight();
+      });
+
       // ==========================================
       // プレビュー描画（個別ズーム・回転・ドラッグ移動対応）
       // ==========================================
       function renderAllPreviews() {
         previewContainer.innerHTML = "";
         if (uploadedFiles.length === 0) {
+          previewContainer.style.maxHeight = "";
           previewContainer.appendChild(emptyState);
           previewContainer.className =
-            "grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1";
+            "grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1 scrollbar-gutter-stable";
           return;
         }
 
         if (uploadedFiles.length === 1) {
           previewContainer.className =
-            "grid grid-cols-1 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1";
+            "grid grid-cols-1 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1 scrollbar-gutter-stable";
         } else {
           previewContainer.className =
-            "grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1";
+            "grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1 scrollbar-gutter-stable";
         }
 
         uploadedFiles.forEach((item) => {
@@ -1478,6 +1535,7 @@
             };
           }
         });
+        fitPreviewHeight();
       }
 
       // ==========================================
@@ -1739,9 +1797,12 @@
           contrastVal >= 0 ? 1.0 + contrastVal * 1.5 : 1.0 + contrastVal * 0.7;
         const brightness = (adj.brightness || 0) / 100;
         const blackPoint = (adj.blackPoint || 0) / 100;
+        const saturation = (adj.saturation || 0) / 100;
+        const vibrance = (adj.vibrance || 0) / 100;
 
         let brilLow = null;
         let brilLut = null;
+        const exposureLut = exposure !== 0 ? buildExposureLut(exposure) : null;
         const brilExp = exposure !== 0 ? Math.pow(2, exposure * 2.0) : 1.0;
         if (brilliance > 0 || shadows > 0)
           brilLow = buildBrillianceLowFreq(data, width, height);
@@ -1759,6 +1820,8 @@
           brightness !== 0 ? buildBrightnessLut(brightness) : null;
         const blackPointLut =
           blackPoint !== 0 ? buildBlackPointLut(blackPoint) : null;
+        const saturationLut =
+          saturation > 0 ? buildSaturationLut(saturation) : null;
 
         for (let i = 0; i < len; i += 4) {
           let r = data[i] / 255;
@@ -1767,12 +1830,11 @@
 
           let luminance = 0.299 * r + 0.587 * g + 0.114 * b;
 
-          if (exposure !== 0) {
-            const expFactor = Math.pow(2, exposure * 2.0);
-            r *= expFactor;
-            g *= expFactor;
-            b *= expFactor;
-            luminance *= expFactor;
+          if (exposureLut) {
+            r = exposureLut[Math.min(1024, Math.max(0, Math.round(r * 1024)))];
+            g = exposureLut[Math.min(1024, Math.max(0, Math.round(g * 1024)))];
+            b = exposureLut[Math.min(1024, Math.max(0, Math.round(b * 1024)))];
+            luminance = 0.299 * r + 0.587 * g + 0.114 * b;
           }
 
           if (brilliance !== 0) {
@@ -1878,6 +1940,60 @@
             b = blackPointLut[Math.round(Math.min(1, Math.max(0, b)) * 1024)];
           }
 
+          if (saturation !== 0) {
+            const rc = Math.min(1, Math.max(0, r));
+            const gc = Math.min(1, Math.max(0, g));
+            const bc = Math.min(1, Math.max(0, b));
+            const rl = SRGB_TO_LIN[Math.round(rc * 1024)];
+            const gl = SRGB_TO_LIN[Math.round(gc * 1024)];
+            const bl = SRGB_TO_LIN[Math.round(bc * 1024)];
+            const ml = (rl + gl + bl) / 3;
+            let k = 1 + saturation;
+            if (saturation > 0) {
+              k = saturationLut.a[Math.round(LIN_TO_SRGB[Math.round(ml * 4096)] * 1024)];
+              const mx = Math.max(rc, gc, bc);
+              const d = mx - Math.min(rc, gc, bc);
+              if (d > 1e-6) {
+                let pos;
+                if (mx === rc) pos = (((gc - bc) / d) % 6 + 6) % 6;
+                else if (mx === gc) pos = (bc - rc) / d + 2;
+                else pos = (rc - gc) / d + 4;
+                const i0 = Math.floor(pos) % 6;
+                const tt = pos - Math.floor(pos);
+                const hh = saturationLut.h[i0] * (1 - tt) + saturationLut.h[(i0 + 1) % 6] * tt;
+                k *= 1 + (hh - 1) * Math.min(1, d / mx / 0.08);
+              }
+            }
+            r = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, ml + k * (rl - ml))) * 4096)];
+            g = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, ml + k * (gl - ml))) * 4096)];
+            b = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, ml + k * (bl - ml))) * 4096)];
+          }
+
+          if (vibrance !== 0) {
+            const rc = Math.min(1, Math.max(0, r));
+            const gc = Math.min(1, Math.max(0, g));
+            const bc = Math.min(1, Math.max(0, b));
+            const rl = SRGB_TO_LIN[Math.round(rc * 1024)];
+            const gl = SRGB_TO_LIN[Math.round(gc * 1024)];
+            const bl = SRGB_TO_LIN[Math.round(bc * 1024)];
+            const lum = 0.299 * rl + 0.587 * gl + 0.114 * bl;
+            const max = Math.max(rl, gl, bl);
+            const min = Math.min(rl, gl, bl);
+            const sat = max === 0 ? 0 : (max - min) / max;
+            let factor;
+            if (vibrance > 0) {
+              factor = 1 + vibrance * Math.pow(1 - sat, 0.7) * 1.3;
+            } else {
+              factor = 1 + vibrance * 0.9;
+            }
+            const rl2 = lum + (rl - lum) * factor;
+            const gl2 = lum + (gl - lum) * factor;
+            const bl2 = lum + (bl - lum) * factor;
+            r = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, rl2)) * 4096)];
+            g = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, gl2)) * 4096)];
+            b = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, bl2)) * 4096)];
+          }
+
           data[i] = Math.min(255, Math.max(0, r * 255));
           data[i + 1] = Math.min(255, Math.max(0, g * 255));
           data[i + 2] = Math.min(255, Math.max(0, b * 255));
@@ -1887,6 +2003,50 @@
       }
 
       // ヘルパー群
+      // [8] 彩度: 線形光でRGB平均を基準に色差をk倍する。−側は k=1+スライダー値（−100で完全なグレー）。
+      // ＋側は実機画像から逆算した「輝度別ゲインA × 色相別係数H」（暗部ほど強く、赤・マゼンタはやや弱く、緑〜シアンはやや強い）
+      const SRGB_TO_LIN = new Float32Array(1025);
+      const LIN_TO_SRGB = new Float32Array(4097);
+      for (let i = 0; i <= 1024; i++) {
+        const c = i / 1024;
+        SRGB_TO_LIN[i] = c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+      }
+      for (let i = 0; i <= 4096; i++) {
+        const l = i / 4096;
+        LIN_TO_SRGB[i] = l <= 0.0031308 ? l * 12.92 : 1.055 * Math.pow(l, 1 / 2.4) - 0.055;
+      }
+
+      const SATURATION_LEVELS = [0, 25, 50, 75, 100];
+      const SATURATION_A = [
+        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        [1.73, 1.57, 1.52, 1.37, 1.32, 1.27, 1.22, 1.17, 1.12, 1.07, 1.07, 1.12],
+        [2.55, 2.15, 2, 1.75, 1.7, 1.6, 1.45, 1.3, 1.2, 1.15, 1.1, 1.2],
+        [3.26, 2.96, 2.66, 2.31, 2.16, 2.01, 1.91, 1.71, 1.61, 1.45, 1.4, 1.56],
+        [3.28, 3.03, 2.84, 2.44, 2.49, 2.34, 2.19, 1.99, 1.84, 1.74, 1.74, 1.84],
+      ];
+      const SATURATION_H = [
+        [1, 1, 1, 1, 1, 1],
+        [0.83, 0.92, 1.17, 1.1, 1.06, 0.92],
+        [0.71, 0.88, 1.28, 1.18, 1.07, 0.89],
+        [0.72, 0.99, 1.28, 1.12, 1.02, 0.89],
+        [0.78, 1.03, 1.26, 1.11, 0.93, 0.89],
+      ];
+
+      function buildSaturationLut(saturation) {
+        const s = Math.min(100, Math.max(0, saturation * 100));
+        let li = 0;
+        while (li < SATURATION_LEVELS.length - 2 && s > SATURATION_LEVELS[li + 1]) li++;
+        const t = (s - SATURATION_LEVELS[li]) / (SATURATION_LEVELS[li + 1] - SATURATION_LEVELS[li]);
+        const mix = (tbl) => tbl[li].map((v, j) => v + (tbl[li + 1][j] - v) * t);
+        const A = mix(SATURATION_A);
+        const a = new Float32Array(1025);
+        for (let i = 0; i <= 1024; i++) {
+          const pos = Math.min(A.length - 1, Math.max(0, (i / 1024) * A.length - 0.5));
+          const j = Math.min(A.length - 2, Math.floor(pos));
+          a[i] = A[j] + (A[j + 1] - A[j]) * (pos - j);
+        }
+        return { a, h: mix(SATURATION_H) };
+      }
       const BLACKPOINT_LEVELS = [-100, -75, -50, -25, 0, 25, 50, 75, 100];
       const BLACKPOINT_F = [
         [
@@ -2172,6 +2332,19 @@
         }
         return { f, k, c };
       }
+      function buildExposureLut(exposure) {
+        const n = 1024;
+        const lut = new Float32Array(n + 1);
+        const ev = exposure * 2.0;
+        const factor = Math.pow(2, ev);
+        for (let i = 0; i <= n; i++) {
+          const linear = SRGB_TO_LIN[i];
+          const adjusted = linear * factor;
+          lut[i] = LIN_TO_SRGB[Math.min(4096, Math.max(0, Math.round(adjusted * 4096)))];
+        }
+        return lut;
+      }
+
 
       function buildBrillianceLowFreq(data, width, height) {
         const m = Math.max(width, height);
