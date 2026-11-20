@@ -1,2509 +1,1751 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ja">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>フリップ ヤフオク写真加工用ツール</title>
-
     <script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
-
     <style>
-      /* --- 標準CSSによるユーティリティ定義（CDN代替） --- */
-      *,
-      ::before,
-      ::after {
-        box-sizing: border-box;
-        border-width: 0;
-        border-style: solid;
-        border-color: #e2e8f0;
-      }
-      body {
-        margin: 0;
-        font-family:
-          system-ui,
-          -apple-system,
-          BlinkMacSystemFont,
-          "Segoe UI",
-          Roboto,
-          "Helvetica Neue",
-          Arial,
-          sans-serif;
-        background-color: #f1f5f9;
-        color: #1e293b;
-        min-height: 100vh;
-        padding: 1rem;
-      }
-      @media (min-width: 768px) {
-        body {
-          padding: 2rem;
-        }
-      }
+        *, ::before, ::after { box-sizing: border-box; border-width: 0; border-style: solid; border-color: #e2e8f0; }
+        body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f1f5f9; color: #1e293b; min-height: 100vh; padding: 1rem; }
+        @media (min-width: 768px) { body { padding: 2rem; } }
+        .max-w-7xl { max-width: 80rem; }
+        .mx-auto { margin-left: auto; margin-right: auto; }
+        .space-y-6 > * + * { margin-top: 1.5rem; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+        .space-y-3 > * + * { margin-top: 0.75rem; }
+        .space-y-2 > * + * { margin-top: 0.5rem; }
+        .space-y-1 > * + * { margin-top: 0.25rem; }
+        .grid { display: grid; }
+        .grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+        @media (min-width: 640px) { .sm\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+        @media (min-width: 1024px) { .lg\:grid-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)); } .lg\:col-span-1 { grid-column: span 1 / span 1; } .lg\:col-span-2 { grid-column: span 2 / span 2; } }
+        .gap-6 { gap: 1.5rem; }
+        .gap-4 { gap: 1rem; }
+        .gap-3 { gap: 0.75rem; }
+        .gap-2 { gap: 0.5rem; }
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .items-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .justify-center { justify-content: center; }
+        .hidden { display: none !important; }
+        .cursor-pointer { cursor: pointer; }
+        .transition-all { transition: all 0.15s ease-in-out; }
+        .bg-white { background-color: #ffffff; }
+        .bg-slate-50 { background-color: #f8fafc; }
+        .bg-slate-100 { background-color: #f1f5f9; }
+        .bg-slate-200 { background-color: #e2e8f0; }
+        .bg-blue-50 { background-color: #eff6ff; }
+        .bg-blue-50\/50 { background-color: rgba(239, 246, 255, 0.5); }
+        .hover\:bg-blue-50:hover { background-color: #eff6ff; }
+        .bg-blue-100 { background-color: #dbeafe; }
+        .bg-blue-600 { background-color: #2563eb; }
+        .hover\:bg-blue-700:hover { background-color: #1d4ed8; }
+        .bg-red-50 { background-color: #fef2f2; }
+        .hover\:bg-red-100:hover { background-color: #fee2e2; }
+        .bg-slate-800 { background-color: #1e293b; }
+        .hover\:bg-slate-900:hover { background-color: #0f172a; }
+        .bg-amber-50\/20 { background-color: rgba(254, 243, 199, 0.2); }
+        .bg-amber-500 { background-color: #f59e0b; }
+        .bg-amber-100 { background-color: #fef3c7; }
+        .bg-purple-100 { background-color: #f3e8ff; }
+        .bg-black\/60 { background-color: rgba(0, 0, 0, 0.6); }
+        .text-slate-900 { color: #0f172a; }
+        .text-slate-800 { color: #1e293b; }
+        .text-slate-700 { color: #334155; }
+        .text-slate-600 { color: #475569; }
+        .text-slate-500 { color: #64748b; }
+        .text-blue-900 { color: #1e3a8a; }
+        .text-blue-800 { color: #1e40af; }
+        .text-blue-600 { color: #2563eb; }
+        .text-red-600 { color: #dc2626; }
+        .text-amber-800 { color: #92400e; }
+        .text-purple-800 { color: #6b21a8; }
+        .text-white { color: #ffffff; }
+        .font-bold { font-weight: 700; }
+        .font-semibold { font-weight: 600; }
+        .font-medium { font-weight: 500; }
+        .font-extrabold { font-weight: 800; }
+        .text-2xl { font-size: 1.5rem; line-height: 2rem; }
+        .text-sm { font-size: 0.875rem; line-height: 1.25rem; }
+        .text-xs { font-size: 0.75rem; line-height: 1.25rem; }
+        .text-\[11px\] { font-size: 11px; }
+        .text-\[10px\] { font-size: 10px; }
+        .p-6 { padding: 1.5rem; }
+        .p-4 { padding: 1rem; }
+        .p-3 { padding: 0.75rem; }
+        .p-2 { padding: 0.5rem; }
+        .px-4 { padding-left: 1rem; padding-right: 1rem; }
+        .px-3 { padding-left: 0.75rem; padding-right: 0.75rem; }
+        .px-2\.5 { padding-left: 0.625rem; padding-right: 0.625rem; }
+        .py-2\.5 { padding-top: 0.625rem; padding-bottom: 0.625rem; }
+        .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+        .py-20 { padding-top: 5rem; padding-bottom: 5rem; }
+        .pb-2 { padding-bottom: 0.5rem; }
+        .pb-3 { padding-bottom: 0.75rem; }
+        .pt-2 { padding-top: 0.5rem; }
+        .rounded-2xl { border-radius: 1rem; }
+        .rounded-xl { border-radius: 0.75rem; }
+        .rounded-lg { border-radius: 0.5rem; }
+        .rounded-full { border-radius: 9999px; }
+        .rounded { border-radius: 0.25rem; }
+        .border { border-width: 1px; }
+        .border-2 { border-width: 2px; }
+        .border-dashed { border-style: dashed; }
+        .border-slate-200 { border-color: #e2e8f0; }
+        .border-slate-300 { border-color: #cbd5e1; }
+        .border-blue-400 { border-color: #60a5fa; }
+        .border-red-200 { border-color: #fecaca; }
+        .border-orange-100 { border-color: #ffedd5; }
+        .hover\:border-blue-300:hover { border-color: #93c5fd; }
+        .shadow-sm { box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); }
+        .shadow { box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06); }
+        .shadow-lg { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .fixed { position: fixed; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .top-2 { top: 0.5rem; }
+        .left-2 { left: 0.5rem; }
+        .bottom-2 { bottom: 0.5rem; }
+        .right-2 { right: 0.5rem; }
+        .z-10 { z-index: 10; }
+        .z-50 { z-index: 50; }
+        .aspect-square { aspect-ratio: 1 / 1; }
+        .overflow-hidden { overflow: hidden; }
+        .overflow-y-auto { overflow-y: auto; }
+        .max-h-\[750px\] { max-height: 750px; }
+        .pr-2 { padding-right: 0.5rem; }
+        .col-span-full { grid-column: 1 / -1; }
+        .truncate { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .max-w-\[130px\] { max-width: 130px; }
+        .max-w-\[120px\] { max-width: 120px; }
+        .max-w-sm { max-width: 24rem; }
+        .w-12 { width: 3rem; }
+        .h-12 { height: 3rem; }
+        .w-16 { width: 4rem; }
+        .h-16 { height: 4rem; }
+        .w-4 { width: 1rem; }
+        .h-4 { height: 1rem; }
+        .w-8 { width: 2rem; }
+        .h-8 { height: 2rem; }
+        .w-full { width: 100%; }
+        .max-w-full { max-width: 100%; }
+        .max-h-full { max-height: 100%; }
+        .object-contain { object-fit: contain; }
+        .outline-none { outline: 2px solid transparent; outline-offset: 2px; }
+        .backdrop-blur-sm { backdrop-filter: blur(4px); }
+        .selected-card { outline: 6px solid #f59e0b !important; outline-offset: -2px; box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4) !important; }
+        input[type="color"] { appearance: none; background: #ffffff; cursor: pointer; border: 1px solid #cbd5e1; border-radius: 0.5rem; padding: 2px; }
+        input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        input[type="color"]::-webkit-color-swatch { border: none; border-radius: 0.375rem; }
+        input[type="range"] { accent-color: #2563eb; cursor: pointer; }
+        .scrollbar-gutter-stable { scrollbar-gutter: stable; }
 
-      .max-w-7xl {
-        max-width: 80rem;
-      }
-      .mx-auto {
-        margin-left: auto;
-        margin-right: auto;
-      }
-      .space-y-6 > * + * {
-        margin-top: 1.5rem;
-      }
-      .space-y-4 > * + * {
-        margin-top: 1rem;
-      }
-      .space-y-3 > * + * {
-        margin-top: 0.75rem;
-      }
-      .space-y-2 > * + * {
-        margin-top: 0.5rem;
-      }
-      .space-y-1 > * + * {
-        margin-top: 0.25rem;
-      }
+        /* トグルスイッチ */
+        .toggle-btn { position: relative; display: inline-flex; height: 1.5rem; width: 2.75rem; align-items: center; border-radius: 9999px !important; transition: background-color 0.15s ease-in-out; cursor: pointer; border: none; padding: 0; overflow: hidden; }
+        .toggle-btn.on { background-color: #2563eb; }
+        .toggle-btn.off { background-color: #cbd5e1; }
+        .toggle-knob { display: inline-block; height: 1rem; width: 1rem; transform: translateX(0.25rem); border-radius: 9999px; background-color: white; transition: transform 0.15s ease-in-out; box-shadow: 0 1px 3px rgba(0,0,0,0.15); }
+        .toggle-btn.on .toggle-knob { transform: translateX(1.5rem); }
+        .toggle-btn.off .toggle-knob { transform: translateX(0.25rem); }
 
-      .grid {
-        display: grid;
-      }
-      .grid-cols-1 {
-        grid-template-columns: repeat(1, minmax(0, 1fr));
-      }
-      @media (min-width: 640px) {
-        .sm\:grid-cols-2 {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
-      }
-      @media (min-width: 1024px) {
-        .lg\:grid-cols-3 {
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-        .lg\:col-span-1 {
-          grid-column: span 1 / span 1;
-        }
-        .lg\:col-span-2 {
-          grid-column: span 2 / span 2;
-        }
-      }
-      .gap-6 {
-        gap: 1.5rem;
-      }
-      .gap-4 {
-        gap: 1rem;
-      }
-      .gap-3 {
-        gap: 0.75rem;
-      }
-      .gap-2 {
-        gap: 0.5rem;
-      }
-
-      .flex {
-        display: flex;
-      }
-      .flex-col {
-        flex-direction: column;
-      }
-      .items-center {
-        align-items: center;
-      }
-      .justify-between {
-        justify-content: space-between;
-      }
-      .justify-center {
-        justify-content: center;
-      }
-
-      .hidden {
-        display: none !important;
-      }
-      .cursor-pointer {
-        cursor: pointer;
-      }
-      .transition-all {
-        transition: all 0.15s ease-in-out;
-      }
-
-      .bg-white {
-        background-color: #ffffff;
-      }
-      .bg-slate-50 {
-        background-color: #f8fafc;
-      }
-      .bg-slate-100 {
-        background-color: #f1f5f9;
-      }
-      .bg-slate-200 {
-        background-color: #e2e8f0;
-      }
-      .bg-blue-50 {
-        background-color: #eff6ff;
-      }
-      .bg-blue-50\/50 {
-        background-color: rgba(239, 246, 255, 0.5);
-      }
-      .hover\:bg-blue-50:hover {
-        background-color: #eff6ff;
-      }
-      .bg-blue-100 {
-        background-color: #dbeafe;
-      }
-      .bg-blue-600 {
-        background-color: #2563eb;
-      }
-      .hover\:bg-blue-700:hover {
-        background-color: #1d4ed8;
-      }
-      .bg-red-50 {
-        background-color: #fef2f2;
-      }
-      .hover\:bg-red-100:hover {
-        background-color: #fee2e2;
-      }
-      .bg-slate-800 {
-        background-color: #1e293b;
-      }
-      .hover\:bg-slate-900:hover {
-        background-color: #0f172a;
-      }
-      .bg-amber-50\/20 {
-        background-color: rgba(254, 243, 199, 0.2);
-      }
-      .bg-amber-500 {
-        background-color: #f59e0b;
-      }
-      .bg-amber-100 {
-        background-color: #fef3c7;
-      }
-      .bg-purple-100 {
-        background-color: #f3e8ff;
-      }
-      .bg-black\/60 {
-        background-color: rgba(0, 0, 0, 0.6);
-      }
-
-      .text-slate-900 {
-        color: #0f172a;
-      }
-      .text-slate-800 {
-        color: #1e293b;
-      }
-      .text-slate-700 {
-        color: #334155;
-      }
-      .text-slate-600 {
-        color: #475569;
-      }
-      .text-slate-500 {
-        color: #64748b;
-      }
-      .text-blue-900 {
-        color: #1e3a8a;
-      }
-      .text-blue-800 {
-        color: #1e40af;
-      }
-      .text-blue-600 {
-        color: #2563eb;
-      }
-      .text-red-600 {
-        color: #dc2626;
-      }
-      .text-amber-800 {
-        color: #92400e;
-      }
-      .text-purple-800 {
-        color: #6b21a8;
-      }
-      .text-white {
-        color: #ffffff;
-      }
-
-      .font-bold {
-        font-weight: 700;
-      }
-      .font-semibold {
-        font-weight: 600;
-      }
-      .font-medium {
-        font-weight: 500;
-      }
-      .font-extrabold {
-        font-weight: 800;
-      }
-
-      .text-2xl {
-        font-size: 1.5rem;
-        line-height: 2rem;
-      }
-      .text-sm {
-        font-size: 0.875rem;
-        line-height: 1.25rem;
-      }
-      .text-xs {
-        font-size: 0.75rem;
-        line-height: 1.25rem;
-      }
-      .text-\[11px\] {
-        font-size: 11px;
-      }
-      .text-\[10px\] {
-        font-size: 10px;
-      }
-
-      .p-6 {
-        padding: 1.5rem;
-      }
-      .p-4 {
-        padding: 1rem;
-      }
-      .p-3 {
-        padding: 0.75rem;
-      }
-      .p-2 {
-        padding: 0.5rem;
-      }
-      .px-4 {
-        padding-left: 1rem;
-        padding-right: 1rem;
-      }
-      .px-3 {
-        padding-left: 0.75rem;
-        padding-right: 0.75rem;
-      }
-      .px-2\.5 {
-        padding-left: 0.625rem;
-        padding-right: 0.625rem;
-      }
-      .py-2\.5 {
-        padding-top: 0.625rem;
-        padding-bottom: 0.625rem;
-      }
-      .py-2 {
-        padding-top: 0.5rem;
-        padding-bottom: 0.5rem;
-      }
-      .py-20 {
-        padding-top: 5rem;
-        padding-bottom: 5rem;
-      }
-      .pb-2 {
-        padding-bottom: 0.5rem;
-      }
-      .pb-3 {
-        padding-bottom: 0.75rem;
-      }
-      .pt-2 {
-        padding-top: 0.5rem;
-      }
-
-      .rounded-2xl {
-        border-radius: 1rem;
-      }
-      .rounded-xl {
-        border-radius: 0.75rem;
-      }
-      .rounded-lg {
-        border-radius: 0.5rem;
-      }
-      .rounded-full {
-        border-radius: 9999px;
-      }
-      .rounded {
-        border-radius: 0.25rem;
-      }
-
-      .border {
-        border-width: 1px;
-      }
-      .border-2 {
-        border-width: 2px;
-      }
-      .border-dashed {
-        border-style: dashed;
-      }
-      .border-slate-200 {
-        border-color: #e2e8f0;
-      }
-      .border-slate-300 {
-        border-color: #cbd5e1;
-      }
-      .border-blue-400 {
-        border-color: #60a5fa;
-      }
-      .border-red-200 {
-        border-color: #fecaca;
-      }
-      .border-orange-100 {
-        border-color: #ffedd5;
-      }
-      .hover\:border-blue-300:hover {
-        border-color: #93c5fd;
-      }
-
-      .shadow-sm {
-        box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-      }
-      .shadow {
-        box-shadow:
-          0 1px 3px 0 rgba(0, 0, 0, 0.1),
-          0 1px 2px 0 rgba(0, 0, 0, 0.06);
-      }
-      .shadow-lg {
-        box-shadow:
-          0 10px 15px -3px rgba(0, 0, 0, 0.1),
-          0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      }
-
-      .relative {
-        position: relative;
-      }
-      .absolute {
-        position: absolute;
-      }
-      .top-2 {
-        top: 0.5rem;
-      }
-      .left-2 {
-        left: 0.5rem;
-      }
-      .bottom-2 {
-        bottom: 0.5rem;
-      }
-      .right-2 {
-        right: 0.5rem;
-      }
-
-      .aspect-square {
-        aspect-ratio: 1 / 1;
-      }
-      .overflow-hidden {
-        overflow: hidden;
-      }
-      .overflow-y-auto {
-        overflow-y: auto;
-      }
-      .max-h-\[750px\] {
-        max-height: 750px;
-      }
-      .pr-2 {
-        padding-right: 0.5rem;
-      }
-      .col-span-full {
-        grid-column: 1 / -1;
-      }
-      .truncate {
-        overflow: hidden;
-        text-overflow: ellipsis;
-        white-space: nowrap;
-      }
-      .max-w-\[130px\] {
-        max-width: 130px;
-      }
-      .max-w-\[120px\] {
-        max-width: 120px;
-      }
-
-      .w-12 {
-        width: 3rem;
-      }
-      .h-12 {
-        height: 3rem;
-      }
-      .w-16 {
-        width: 4rem;
-      }
-      .h-16 {
-        height: 4rem;
-      }
-      .w-4 {
-        width: 1rem;
-      }
-      .h-4 {
-        height: 1rem;
-      }
-      .w-8 {
-        width: 2rem;
-      }
-      .h-8 {
-        height: 2rem;
-      }
-      .w-full {
-        width: 100%;
-      }
-      .max-w-full {
-        max-width: 100%;
-      }
-      .max-h-full {
-        max-height: 100%;
-      }
-      .object-contain {
-        object-fit: contain;
-      }
-
-      .outline-none {
-        outline: 2px solid transparent;
-        outline-offset: 2px;
-      }
-      .backdrop-blur-sm {
-        backdrop-filter: blur(4px);
-      }
-
-      .selected-card {
-        outline: 6px solid #f59e0b !important;
-        outline-offset: -2px;
-        box-shadow: 0 10px 25px -5px rgba(245, 158, 11, 0.4) !important;
-      }
-
-      input[type="color"] {
-        appearance: none;
-        background: #ffffff;
-        cursor: pointer;
-        border: 1px solid #cbd5e1;
-        border-radius: 0.5rem;
-        padding: 2px;
-      }
-      input[type="color"]::-webkit-color-swatch-wrapper {
-        padding: 0;
-      }
-      input[type="color"]::-webkit-color-swatch {
-        border: none;
-        border-radius: 0.375rem;
-      }
-
-      input[type="range"] {
-        accent-color: #2563eb;
-        cursor: pointer;
-      }
-
-      .scrollbar-gutter-stable {
-        scrollbar-gutter: stable;
-      }
+        /* モーダルアニメーション */
+        .modal-enter { opacity: 0; transform: scale(0.96); }
+        .modal-enter-active { opacity: 1; transform: scale(1); transition: opacity 0.15s ease-out, transform 0.15s ease-out; }
     </style>
-  </head>
-  <body class="bg-slate-100 text-slate-800 min-h-screen p-4 md:p-8">
-    <div class="max-w-7xl mx-auto space-y-6">
-      <!-- ヘッダー -->
-      <header
-        class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200"
-      >
-        <h1 class="text-2xl font-bold text-slate-900">フリップ（FLIP）</h1>
-        <p class="text-sm text-slate-600 mt-1">
-          ヤフオク物販での写真加工を時短するためのツールです。「二重フチ取り」「画像サイズの一括調整」「色調補正」ができます。
-        </p>
-      </header>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen p-4 md:p-8">
+    <!-- トースト通知 -->
+    <div id="toast-container" class="fixed bottom-4 right-4 z-50 space-y-2 pointer-events-none"></div>
 
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <!-- 左側：設定パネル -->
-        <div class="lg:col-span-1 space-y-6">
-          <!-- ドロップゾーン -->
-          <div
-            id="drop-zone"
-            class="border-2 border-dashed border-blue-400 bg-blue-50/50 hover:bg-blue-50 rounded-2xl p-6 text-center cursor-pointer transition-all"
-          >
-            <svg
-              class="w-12 h-12 mx-auto text-blue-500 mb-2"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              ></path>
-            </svg>
-            <p class="font-semibold text-blue-900 text-sm">
-              ここに画像をドラッグ＆ドロップ
-            </p>
-            <p class="text-xs text-blue-600 mt-1">
-              またはクリックしてファイルを選択（複数可）
-            </p>
-            <input
-              type="file"
-              id="file-input"
-              class="hidden"
-              accept="image/*"
-              multiple
-            />
-          </div>
-
-          <!-- 編集設定コンテナ -->
-          <div
-            id="settings-panel"
-            class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5 overflow-y-auto max-h-[750px]"
-          >
-            <div
-              class="border-b pb-2 flex justify-between items-center sticky top-0 bg-white z-10 py-1"
-            >
-              <h2 class="font-bold text-slate-900" id="settings-title">
-                一括編集設定
-              </h2>
-              <div class="flex items-center space-x-2">
-                <button
-                  id="btn-reset-adjustments"
-                  class="text-xs text-blue-600 hover:text-blue-800 underline font-medium"
-                  title="色調補正をすべてリセット"
-                >
-                  補正リセット
-                </button>
-                <span
-                  id="target-mode-badge"
-                  class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800"
-                  >全体に適用</span
-                >
-              </div>
+    <!-- 保存方法選択モーダル -->
+    <div id="save-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl shadow-lg p-6 max-w-sm w-full mx-4 space-y-4">
+            <h3 class="font-bold text-lg text-slate-900">保存方法を選択</h3>
+            <p id="save-modal-desc" class="text-xs text-slate-500">保存方法を選んでください。</p>
+            <div id="save-options-pc" class="space-y-2">
+                <button id="save-download-pc" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-xl transition-all text-sm">既定のフォルダにZIPダウンロード</button>
+                <button id="save-picker-pc" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-xl transition-all text-sm">保存先を選んでZIP保存</button>
             </div>
-
-            <!-- 選択中画像の削除ボタン -->
-            <div id="delete-action-area" class="hidden">
-              <button
-                id="btn-delete-selected"
-                class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2 px-3 rounded-xl border border-red-200 transition-all text-xs flex items-center justify-center space-x-1"
-              >
-                <svg
-                  class="w-4 h-4"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                  ></path>
-                </svg>
-                <span id="btn-delete-text">選択中の画像を削除</span>
-              </button>
+            <div id="save-options-mobile" class="space-y-2 hidden">
+                <button id="save-photo-mobile" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 px-4 rounded-xl transition-all text-sm">写真アプリに保存</button>
+                <button id="save-file-mobile" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-xl transition-all text-sm">ファイルにダウンロード</button>
             </div>
-
-            <!-- キャンバス基本設定 -->
-            <div
-              class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200"
-            >
-              <h3
-                class="text-xs font-bold text-slate-800 border-b border-slate-200 pb-1"
-              >
-                キャンバス設定 (1:1 固定)
-              </h3>
-              <div class="grid grid-cols-2 gap-3">
-                <div class="space-y-1">
-                  <label class="text-[11px] font-semibold text-slate-600"
-                    >画像サイズ (px)</label
-                  >
-                  <input
-                    type="number"
-                    id="canvas-size"
-                    value="1200"
-                    min="100"
-                    max="4000"
-                    step="10"
-                    class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <label class="text-[11px] font-semibold text-slate-600"
-                    >余白の背景色</label
-                  >
-                  <input
-                    type="color"
-                    id="bg-color"
-                    value="#FFFFFF"
-                    class="w-full h-[38px] rounded-lg cursor-pointer border border-slate-300 block"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <!-- フチ設定 -->
-            <div
-              class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200"
-            >
-              <h3
-                class="text-xs font-bold text-slate-800 border-b border-slate-200 pb-1"
-              >
-                二重フチ取り設定
-              </h3>
-              <div class="space-y-2">
-                <div class="space-y-1">
-                  <label class="text-[11px] font-semibold text-slate-600"
-                    >フチを適用する対象</label
-                  >
-                  <select
-                    id="target-scope"
-                    class="w-full text-xs border border-slate-300 rounded-lg p-2 bg-white outline-none"
-                  >
-                    <option value="image">本来の画像の部分だけ</option>
-                    <option value="canvas">キャンバス全体（余白含む）</option>
-                  </select>
-                </div>
-                <div class="space-y-1">
-                  <label class="text-[11px] font-semibold text-slate-600"
-                    >フチの方向（揃え方）</label
-                  >
-                  <select
-                    id="border-align"
-                    class="w-full text-xs border border-slate-300 rounded-lg p-2 bg-white outline-none"
-                  >
-                    <option value="outside" selected>
-                      外側揃え（端にフィット）
-                    </option>
-                    <option value="inside">内側揃え（内側へ描画）</option>
-                  </select>
-                </div>
-              </div>
-
-              <!-- 1層目（外側・橙） -->
-              <div class="pt-2 border-t border-slate-200 space-y-2">
-                <div class="flex justify-between items-center">
-                  <label class="text-[11px] font-bold text-orange-900"
-                    >1層目：外側フチ</label
-                  >
-                  <input
-                    type="color"
-                    id="outer-color"
-                    value="#F58220"
-                    class="w-7 h-7 rounded border border-slate-300 cursor-pointer"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between text-[11px] text-orange-800">
-                    <span>太さ</span>
-                    <span id="outer-size-val">30px</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="outer-size"
-                    min="0"
-                    max="100"
-                    value="30"
-                    class="w-full accent-orange-500"
-                  />
-                </div>
-              </div>
-
-              <!-- 2層目（内側・白） -->
-              <div class="pt-2 border-t border-slate-200 space-y-2">
-                <div class="flex justify-between items-center">
-                  <label class="text-[11px] font-bold text-slate-900"
-                    >2層目：内側フチ</label
-                  >
-                  <input
-                    type="color"
-                    id="inner-color"
-                    value="#FFFFFF"
-                    class="w-7 h-7 rounded border border-slate-300 cursor-pointer"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between text-[11px] text-slate-700">
-                    <span>太さ</span>
-                    <span id="inner-size-val">30px</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="inner-size"
-                    min="0"
-                    max="100"
-                    value="30"
-                    class="w-full accent-blue-500"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <!-- iPhone風色調補正 15項目 -->
-            <div
-              class="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200"
-            >
-              <h3
-                class="text-xs font-bold text-slate-800 border-b border-slate-200 pb-1"
-              >
-                色調補正
-              </h3>
-
-              <div class="space-y-3 text-xs" id="adjustments-container">
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[1] 露出 (Exposure)</span
-                    ><span id="val-exposure">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-exposure"
-                    min="-100"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[2] ブリリアンス (Brilliance)</span
-                    ><span id="val-brilliance">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-brilliance"
-                    min="-100"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[3] ハイライト (Highlights)</span
-                    ><span id="val-highlights">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-highlights"
-                    min="-100"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[4] シャドウ (Shadows)</span
-                    ><span id="val-shadows">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-shadows"
-                    min="-100"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[5] コントラスト (Contrast)</span
-                    ><span id="val-contrast">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-contrast"
-                    min="-100"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[6] 明るさ (Brightness)</span
-                    ><span id="val-brightness">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-brightness"
-                    min="-100"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[7] ブラックポイント (Black Point)</span
-                    ><span id="val-blackPoint">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-blackPoint"
-                    min="-100"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[8] 彩度 (Saturation)</span
-                    ><span id="val-saturation">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-saturation"
-                    min="-100"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <div class="space-y-1">
-                  <div class="flex justify-between font-medium text-slate-700">
-                    <span>[9] 自然な彩度 (Vibrance)</span
-                    ><span id="val-vibrance">0</span>
-                  </div>
-                  <input
-                    type="range"
-                    id="adj-vibrance"
-                    min="-100"
-                    max="100"
-                    value="0"
-                    class="w-full"
-                  />
-                </div>
-                <!-- [10]〜[15] 未実装のためコメントアウト -->
-                <!-- <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br /> -->
-              </div>
-            </div>
-
-            <!-- アクションボタン -->
-            <div class="pt-2">
-              <button
-                id="btn-download-all"
-                class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-xl shadow transition-all text-sm hidden"
-              >
-                すべて一括ダウンロード
-              </button>
-            </div>
-          </div>
+            <button id="save-modal-close" class="w-full bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold py-2 px-4 rounded-xl transition-all text-sm">キャンセル</button>
         </div>
-
-        <!-- 右側：プレビュー＆結果エリア -->
-        <div class="lg:col-span-2 space-y-4">
-          <div
-            class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 min-h-[500px] flex flex-col"
-          >
-            <div class="flex justify-between items-center border-b pb-3 mb-4">
-              <h2 class="font-bold text-slate-900">
-                処理済み画像一覧 (<span id="image-count">0</span>件)
-              </h2>
-              <span class="text-xs text-slate-500"
-                >※拡大中はプレビュー内をドラッグで位置移動可能</span
-              >
-            </div>
-
-            <!-- プレビューグリッド -->
-            <div
-              id="preview-container"
-              class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1 scrollbar-gutter-stable"
-            >
-              <div
-                id="empty-state"
-                class="col-span-full py-20 text-center text-slate-400"
-              >
-                <svg
-                  class="w-16 h-16 mx-auto mb-3 text-slate-300"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.5"
-                    d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                  ></path>
-                </svg>
-                <p class="text-sm">画像がまだ追加されていません</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
 
-    <!-- JavaScript処理ロジック -->
-    <script>
-      const dropZone = document.getElementById("drop-zone");
-      const fileInput = document.getElementById("file-input");
-      const previewContainer = document.getElementById("preview-container");
-      const emptyState = document.getElementById("empty-state");
-      const imageCount = document.getElementById("image-count");
-      const btnDownloadAll = document.getElementById("btn-download-all");
-      const btnResetAdjustments = document.getElementById(
-        "btn-reset-adjustments",
-      );
-
-      const settingsTitle = document.getElementById("settings-title");
-      const targetModeBadge = document.getElementById("target-mode-badge");
-      const deleteActionArea = document.getElementById("delete-action-area");
-      const btnDeleteSelected = document.getElementById("btn-delete-selected");
-      const btnDeleteText = document.getElementById("btn-delete-text");
-
-      const canvasSizeInput = document.getElementById("canvas-size");
-      const bgColorInput = document.getElementById("bg-color");
-
-      const outerColorInput = document.getElementById("outer-color");
-      const outerSizeInput = document.getElementById("outer-size");
-      const outerSizeVal = document.getElementById("outer-size-val");
-
-      const innerColorInput = document.getElementById("inner-color");
-      const innerSizeInput = document.getElementById("inner-size");
-      const innerSizeVal = document.getElementById("inner-size-val");
-
-      const targetScopeSelect = document.getElementById("target-scope");
-      const borderAlignSelect = document.getElementById("border-align");
-
-      const adjustmentKeys = [
-        "exposure",
-        "brilliance",
-        "highlights",
-        "shadows",
-        "contrast",
-        "brightness",
-        "blackPoint",
-        "saturation",
-        "vibrance",
-      ];
-
-      const defaultAdjustments = {
-        exposure: 0,
-        brilliance: 0,
-        highlights: 0,
-        shadows: 0,
-        contrast: 0,
-        brightness: 0,
-        blackPoint: 0,
-        saturation: 0,
-        vibrance: 0,
-      };
-
-      let globalSettings = {
-        canvasSize: 1200,
-        bgColor: "#FFFFFF",
-        outerColor: "#F58220",
-        outerSize: 30,
-        innerColor: "#FFFFFF",
-        innerSize: 30,
-        targetScope: "image",
-        borderAlign: "outside",
-        adjustments: { ...defaultAdjustments },
-        zoom: 0.0,
-        zoomX: 0.5,
-        zoomY: 0.5,
-        rotation: 0.0,
-      };
-
-      let uploadedFiles = [];
-      let selectedImageIds = [];
-      let renderTimer = null;
-
-      outerSizeInput.addEventListener("input", () => {
-        outerSizeVal.textContent = outerSizeInput.value + "px";
-        handleSettingChange(false);
-      });
-      innerSizeInput.addEventListener("input", () => {
-        innerSizeVal.textContent = innerSizeInput.value + "px";
-        handleSettingChange(false);
-      });
-
-      [canvasSizeInput, targetScopeSelect, borderAlignSelect].forEach((el) => {
-        el.addEventListener("change", () => handleSettingChange(true));
-      });
-
-      [bgColorInput, outerColorInput, innerColorInput].forEach((el) => {
-        el.addEventListener("input", () => handleSettingChange(false));
-        el.addEventListener("change", () => handleSettingChange(true));
-      });
-
-      adjustmentKeys.forEach((key) => {
-        const slider = document.getElementById(`adj-${key}`);
-        const valSpan = document.getElementById(`val-${key}`);
-        if (slider && valSpan) {
-          slider.addEventListener("input", () => {
-            valSpan.textContent = slider.value;
-            handleSettingChange(false);
-          });
-          slider.addEventListener("change", () => {
-            handleSettingChange(true);
-          });
-        }
-      });
-
-      btnResetAdjustments.addEventListener("click", () => {
-        adjustmentKeys.forEach((key) => {
-          const slider = document.getElementById(`adj-${key}`);
-          const valSpan = document.getElementById(`val-${key}`);
-          if (slider) slider.value = 0;
-          if (valSpan) valSpan.textContent = "0";
-        });
-        handleSettingChange(true, ["adjustments"]);
-      });
-
-      btnDeleteSelected.addEventListener("click", () => {
-        if (selectedImageIds.length === 0) return;
-        uploadedFiles = uploadedFiles.filter(
-          (item) => !selectedImageIds.includes(item.id),
-        );
-        selectedImageIds = [];
-        updateImageCount();
-        updateUIForSelection();
-        syncFormWithConfig(globalSettings);
-        renderAllPreviews();
-      });
-
-      document.addEventListener("click", (e) => {
-        if (selectedImageIds.length === 0) return;
-        const isCard = e.target.closest(".image-card");
-        const isSettings = e.target.closest("#settings-panel");
-        const isDropZone = e.target.closest("#drop-zone");
-
-        if (!isCard && !isSettings && !isDropZone) {
-          resetToGlobalMode();
-        }
-      });
-
-      function resetToGlobalMode() {
-        selectedImageIds = [];
-        updateUIForSelection();
-        syncFormWithConfig(globalSettings);
-        renderAllPreviews();
-      }
-
-      dropZone.addEventListener("click", () => fileInput.click());
-      dropZone.addEventListener("dragover", (e) => {
-        e.preventDefault();
-        dropZone.classList.add("bg-blue-100");
-      });
-      dropZone.addEventListener("dragleave", () =>
-        dropZone.classList.remove("bg-blue-100"),
-      );
-      dropZone.addEventListener("drop", (e) => {
-        e.preventDefault();
-        dropZone.classList.remove("bg-blue-100");
-        if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files);
-      });
-      fileInput.addEventListener("change", (e) => {
-        if (e.target.files.length > 0) handleFiles(e.target.files);
-      });
-
-      function handleFiles(files) {
-        for (let file of files) {
-          if (!file.type.startsWith("image/")) continue;
-          const reader = new FileReader();
-          reader.onload = (e) => {
-            const img = new Image();
-            img.onload = () => {
-              uploadedFiles.push({
-                id:
-                  "img_" +
-                  Date.now() +
-                  "_" +
-                  Math.random().toString(36).substr(2, 9),
-                file: file,
-                name: file.name,
-                img: img,
-                config: JSON.parse(JSON.stringify(globalSettings)),
-              });
-              updateImageCount();
-              renderAllPreviews();
-            };
-            img.src = e.target.result;
-          };
-          reader.readAsDataURL(file);
-        }
-      }
-
-      function updateImageCount() {
-        imageCount.textContent = uploadedFiles.length;
-        if (uploadedFiles.length > 0) {
-          emptyState.style.display = "none";
-          btnDownloadAll.classList.remove("hidden");
-        } else {
-          emptyState.style.display = "block";
-          btnDownloadAll.classList.add("hidden");
-        }
-      }
-
-      function collectCurrentFormConfig() {
-        const adj = {};
-        adjustmentKeys.forEach((key) => {
-          const slider = document.getElementById(`adj-${key}`);
-          adj[key] = slider ? parseInt(slider.value) || 0 : 0;
-        });
-
-        return {
-          canvasSize: parseInt(canvasSizeInput.value) || 1200,
-          bgColor: bgColorInput.value,
-          outerColor: outerColorInput.value,
-          outerSize: parseInt(outerSizeInput.value) || 0,
-          innerColor: innerColorInput.value,
-          innerSize: parseInt(innerSizeInput.value) || 0,
-          targetScope: targetScopeSelect.value,
-          borderAlign: borderAlignSelect.value,
-          adjustments: adj,
-        };
-      }
-
-      // 直前のフォーム状態（変更された項目だけを検出するための基準）
-      let lastFormConfig = collectCurrentFormConfig();
-
-      // 「変更された項目」だけを対象画像に反映する。
-      // 触っていない項目（個別に設定した傾き・ズーム・色調など）は上書きしない。
-      function applyFormDiff(targetCfg, cur, force) {
-        const prev = lastFormConfig;
-        Object.keys(cur).forEach((key) => {
-          if (key === "adjustments") return;
-          if (force.includes(key) || cur[key] !== prev[key]) {
-            targetCfg[key] = cur[key];
-          }
-        });
-        const adj = { ...defaultAdjustments, ...(targetCfg.adjustments || {}) };
-        adjustmentKeys.forEach((k) => {
-          if (
-            force.includes("adjustments") ||
-            cur.adjustments[k] !== prev.adjustments[k]
-          ) {
-            adj[k] = cur.adjustments[k];
-          }
-        });
-        targetCfg.adjustments = adj;
-      }
-
-      function handleSettingChange(immediate = true, force = []) {
-        const currentConfig = collectCurrentFormConfig();
-
-        if (selectedImageIds.length === 0) {
-          applyFormDiff(globalSettings, currentConfig, force);
-          uploadedFiles.forEach((item) => {
-            applyFormDiff(item.config, currentConfig, force);
-          });
-        } else {
-          uploadedFiles.forEach((item) => {
-            if (selectedImageIds.includes(item.id)) {
-              applyFormDiff(item.config, currentConfig, force);
-            }
-          });
-        }
-
-        lastFormConfig = currentConfig;
-
-        if (immediate) {
-          renderAllPreviews();
-        } else {
-          clearTimeout(renderTimer);
-          renderTimer = setTimeout(() => {
-            renderAllPreviews();
-          }, 50);
-        }
-      }
-
-      function syncFormWithConfig(config) {
-        canvasSizeInput.value = config.canvasSize;
-        bgColorInput.value = config.bgColor;
-        outerColorInput.value = config.outerColor;
-        outerSizeInput.value = config.outerSize;
-        outerSizeVal.textContent = config.outerSize + "px";
-        innerColorInput.value = config.innerColor;
-        innerSizeInput.value = config.innerSize;
-        innerSizeVal.textContent = config.innerSize + "px";
-        targetScopeSelect.value = config.targetScope;
-        borderAlignSelect.value = config.borderAlign;
-
-        if (config.adjustments) {
-          adjustmentKeys.forEach((key) => {
-            const val = config.adjustments[key] || 0;
-            const slider = document.getElementById(`adj-${key}`);
-            const valSpan = document.getElementById(`val-${key}`);
-            if (slider) slider.value = val;
-            if (valSpan) valSpan.textContent = val;
-          });
-        }
-        lastFormConfig = collectCurrentFormConfig();
-      }
-
-      function updateUIForSelection() {
-        if (selectedImageIds.length === 0) {
-          settingsTitle.textContent = "一括編集設定";
-          targetModeBadge.textContent = "全体に適用";
-          targetModeBadge.className =
-            "text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800";
-          deleteActionArea.classList.add("hidden");
-        } else if (selectedImageIds.length === 1) {
-          const target = uploadedFiles.find(
-            (item) => item.id === selectedImageIds[0],
-          );
-          settingsTitle.textContent = "個別編集設定";
-          targetModeBadge.textContent = target ? target.name : "個別選択中";
-          targetModeBadge.className =
-            "text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 truncate max-w-[120px]";
-          btnDeleteText.textContent = "この画像を削除";
-          deleteActionArea.classList.remove("hidden");
-        } else {
-          settingsTitle.textContent = "複数選択編集設定";
-          targetModeBadge.textContent = `選択中: ${selectedImageIds.length}件`;
-          targetModeBadge.className =
-            "text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-100 text-purple-800";
-          btnDeleteText.textContent = `選択中の${selectedImageIds.length}件を削除`;
-          deleteActionArea.classList.remove("hidden");
-        }
-      }
-
-      // 先頭カード（画像＋ズーム・傾きスライダー＋保存行）がスクロールなしで全部見えるよう、プレビュー領域を下方向へ広げる
-      // （画面幅によってカードの高さが変わるため、描画後と画面サイズ変更時に実測して max-height を決める）
-      function fitPreviewHeight() {
-        previewContainer.style.maxHeight = "";
-        const first = previewContainer.querySelector(".image-card");
-        if (!first) return;
-        const cs = getComputedStyle(previewContainer);
-        const need =
-          first.offsetHeight +
-          parseFloat(cs.paddingTop) +
-          parseFloat(cs.paddingBottom) +
-          8;
-        if (need > (parseFloat(cs.maxHeight) || 0)) {
-          previewContainer.style.maxHeight = need + "px";
-        }
-      }
-      window.addEventListener("resize", () => {
-        if (uploadedFiles.length > 0) fitPreviewHeight();
-      });
-
-      // ==========================================
-      // プレビュー描画（個別ズーム・回転・ドラッグ移動対応）
-      // ==========================================
-      function renderAllPreviews() {
-        previewContainer.innerHTML = "";
-        if (uploadedFiles.length === 0) {
-          previewContainer.style.maxHeight = "";
-          previewContainer.appendChild(emptyState);
-          previewContainer.className =
-            "grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1 scrollbar-gutter-stable";
-          return;
-        }
-
-        if (uploadedFiles.length === 1) {
-          previewContainer.className =
-            "grid grid-cols-1 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1 scrollbar-gutter-stable";
-        } else {
-          previewContainer.className =
-            "grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1 scrollbar-gutter-stable";
-        }
-
-        uploadedFiles.forEach((item) => {
-          if (item.config.zoom === undefined) item.config.zoom = 0.0;
-          if (item.config.zoomX === undefined) item.config.zoomX = 0.5;
-          if (item.config.zoomY === undefined) item.config.zoomY = 0.5;
-          if (item.config.rotation === undefined) item.config.rotation = 0.0;
-
-          const canvas = generateCanvas(item, false);
-          const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
-          const isSelected = selectedImageIds.includes(item.id);
-          const zoomPercent = Number(item.config.zoom).toFixed(1);
-          const rotDeg = Number(item.config.rotation).toFixed(1);
-          const isZoomed = item.config.zoom >= 1.0;
-
-          const card = document.createElement("div");
-          card.className = `image-card bg-slate-50 border border-slate-200 rounded-2xl p-3 flex flex-col space-y-2 cursor-pointer transition-all ${
-            uploadedFiles.length === 1 ? "max-w-2xl mx-auto w-full" : ""
-          } ${
-            isSelected
-              ? "selected-card bg-amber-50/20"
-              : "hover:border-blue-300"
-          }`;
-
-          card.onclick = (e) => {
-            if (
-              e.target.tagName === "A" ||
-              e.target.tagName === "INPUT" ||
-              e.target.tagName === "BUTTON"
-            )
-              return;
-            e.stopPropagation();
-
-            if (e.ctrlKey || e.metaKey) {
-              if (isSelected) {
-                selectedImageIds = selectedImageIds.filter(
-                  (id) => id !== item.id,
-                );
-              } else {
-                selectedImageIds.push(item.id);
-              }
-            } else {
-              selectedImageIds = [item.id];
-            }
-
-            updateUIForSelection();
-            if (selectedImageIds.length === 1) {
-              syncFormWithConfig(item.config);
-            }
-            renderAllPreviews();
-          };
-
-          const sizeText = `${item.config.canvasSize}×${item.config.canvasSize}px`;
-          const downloadBtnId = "dl_" + item.id;
-          const zoomSliderId = "zoom_slider_" + item.id;
-          const zoomValId = "zoom_val_" + item.id;
-          const zoomResetId = "zoom_reset_" + item.id;
-          const rotSliderId = "rot_slider_" + item.id;
-          const rotValId = "rot_val_" + item.id;
-          const rotResetId = "rot_reset_" + item.id;
-          const imgWrapperId = "img_wrap_" + item.id;
-          const imgElId = "img_el_" + item.id;
-
-          card.innerHTML = `
-            <div id="${imgWrapperId}" class="aspect-square bg-slate-200 rounded-xl overflow-hidden border border-slate-200 relative flex items-center justify-center select-none ${isZoomed ? "cursor-grab" : ""}">
-                <img id="${imgElId}" src="${dataUrl}" draggable="false" class="max-w-full max-h-full object-contain pointer-events-none">
-                ${isSelected ? '<span class="absolute top-2 left-2 bg-amber-500 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full shadow-lg">選択中</span>' : ""}
-                ${isZoomed ? '<span class="absolute top-2 right-2 bg-blue-600/85 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm">ドラッグ移動可</span>' : ""}
-                <span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded backdrop-blur-sm">${sizeText}</span>
-            </div>
-
-            <!-- 個別コントロール（ズーム＆回転） -->
-            <div class="bg-white border border-slate-200 rounded-xl p-2.5 space-y-2" onclick="event.stopPropagation()">
-              <div class="space-y-1">
-                <div class="flex justify-between items-center text-[11px]">
-                  <span class="font-semibold text-slate-700">ズーム倍率</span>
-                  <div class="flex items-center space-x-2">
-                    <span id="${zoomValId}" class="font-bold text-blue-600">${zoomPercent}%</span>
-                    <button id="${zoomResetId}" class="text-[10px] text-slate-500 hover:text-blue-600 underline">戻す</button>
-                  </div>
+    <div class="max-w-7xl mx-auto space-y-6">
+        <header class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+            <h1 class="text-2xl font-bold text-slate-900">フリップ（FLIP）</h1>
+            <p class="text-sm text-slate-600 mt-1">ヤフオク物販での写真加工を時短するためのツールです。「二重フチ取り」「画像サイズの一括調整」「色調補正」ができます。</p>
+        </header>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-1 space-y-6">
+                <div id="drop-zone" class="border-2 border-dashed border-blue-400 bg-blue-50/50 hover:bg-blue-50 rounded-2xl p-6 text-center cursor-pointer transition-all">
+                    <svg class="w-12 h-12 mx-auto text-blue-500 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                    <p class="font-semibold text-blue-900 text-sm">ここに画像をドラッグ＆ドロップ</p>
+                    <p class="text-xs text-blue-600 mt-1">またはクリックしてファイルを選択（複数可）</p>
+                    <input type="file" id="file-input" class="hidden" accept="image/*" multiple>
                 </div>
-                <input
-                  type="range"
-                  id="${zoomSliderId}"
-                  min="0"
-                  max="200"
-                  step="0.1"
-                  value="${item.config.zoom}"
-                  class="w-full accent-blue-600"
-                />
-              </div>
-
-              <div class="space-y-1 pt-1 border-t border-slate-100">
-                <div class="flex justify-between items-center text-[11px]">
-                  <span class="font-semibold text-slate-700">傾き補正 (回転)</span>
-                  <div class="flex items-center space-x-2">
-                    <span id="${rotValId}" class="font-bold text-blue-600">${rotDeg}°</span>
-                    <button id="${rotResetId}" class="text-[10px] text-slate-500 hover:text-blue-600 underline">戻す</button>
-                  </div>
+                <div id="settings-panel" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 space-y-5 overflow-y-auto max-h-[750px]">
+                    <div class="border-b pb-2 flex justify-between items-center sticky top-0 bg-white z-10 py-1">
+                        <h2 class="font-bold text-slate-900" id="settings-title">一括編集設定</h2>
+                        <div class="flex items-center space-x-2">
+                            <button id="btn-reset-adjustments" class="text-xs text-blue-600 hover:text-blue-800 underline font-medium" title="色調補正をすべてリセット">補正リセット</button>
+                            <span id="target-mode-badge" class="text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800">全体に適用</span>
+                        </div>
+                    </div>
+                    <div id="delete-action-area" class="hidden">
+                        <button id="btn-delete-selected" class="w-full bg-red-50 hover:bg-red-100 text-red-600 font-semibold py-2 px-3 rounded-xl border border-red-200 transition-all text-xs flex items-center justify-center space-x-1">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            <span id="btn-delete-text">選択中の画像を削除</span>
+                        </button>
+                    </div>
+                    <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <h3 class="text-xs font-bold text-slate-800 border-b border-slate-200 pb-1">キャンバス設定 (1:1 固定)</h3>
+                        <div class="grid grid-cols-2 gap-3">
+                            <div class="space-y-1">
+                                <label class="text-[11px] font-semibold text-slate-600">画像サイズ (px)</label>
+                                <input type="number" id="canvas-size" value="1200" min="100" max="4000" step="10" class="w-full text-sm border border-slate-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-500 outline-none bg-white">
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[11px] font-semibold text-slate-600">余白の背景色</label>
+                                <input type="color" id="bg-color" value="#FFFFFF" class="w-full h-[38px] rounded-lg cursor-pointer border border-slate-300 block">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-3 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <div class="flex items-center justify-between border-b border-slate-200 pb-2">
+                            <h3 class="text-xs font-bold text-slate-800">二重フチ取り設定</h3>
+                            <button id="border-toggle" class="toggle-btn on" title="二重フチ取りのON/OFF" aria-pressed="true">
+                                <span class="toggle-knob"></span>
+                            </button>
+                        </div>
+                        <div id="border-settings" class="space-y-2">
+                            <div class="space-y-1">
+                                <label class="text-[11px] font-semibold text-slate-600">フチを適用する対象</label>
+                                <select id="target-scope" class="w-full text-xs border border-slate-300 rounded-lg p-2 bg-white outline-none">
+                                    <option value="image">本来の画像の部分だけ</option>
+                                    <option value="canvas">キャンバス全体（余白含む）</option>
+                                </select>
+                            </div>
+                            <div class="space-y-1">
+                                <label class="text-[11px] font-semibold text-slate-600">フチの方向（揃え方）</label>
+                                <select id="border-align" class="w-full text-xs border border-slate-300 rounded-lg p-2 bg-white outline-none">
+                                    <option value="outside" selected>外側揃え（端にフィット）</option>
+                                    <option value="inside">内側揃え（内側へ描画）</option>
+                                </select>
+                            </div>
+                            <div class="pt-2 border-t border-slate-200 space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <label class="text-[11px] font-bold text-orange-900">1層目：外側フチ</label>
+                                    <input type="color" id="outer-color" value="#F58220" class="w-7 h-7 rounded border border-slate-300 cursor-pointer">
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-[11px] text-orange-800"><span>太さ</span><span id="outer-size-val">30px</span></div>
+                                    <input type="range" id="outer-size" min="0" max="100" value="30" class="w-full accent-orange-500">
+                                </div>
+                            </div>
+                            <div class="pt-2 border-t border-slate-200 space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <label class="text-[11px] font-bold text-slate-900">2層目：内側フチ</label>
+                                    <input type="color" id="inner-color" value="#FFFFFF" class="w-7 h-7 rounded border border-slate-300 cursor-pointer">
+                                </div>
+                                <div class="space-y-1">
+                                    <div class="flex justify-between text-[11px] text-slate-700"><span>太さ</span><span id="inner-size-val">30px</span></div>
+                                    <input type="range" id="inner-size" min="0" max="100" value="30" class="w-full accent-blue-500">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
+                        <h3 class="text-xs font-bold text-slate-800 border-b border-slate-200 pb-1">色調補正</h3>
+                        <div class="space-y-3 text-xs" id="adjustments-container">
+                            <div class="space-y-1"><div class="flex justify-between font-medium text-slate-700"><span>[1] 露出 (Exposure)</span><span id="val-exposure">0</span></div><input type="range" id="adj-exposure" min="-100" max="100" value="0" class="w-full"></div>
+                            <div class="space-y-1"><div class="flex justify-between font-medium text-slate-700"><span>[2] ブリリアンス (Brilliance)</span><span id="val-brilliance">0</span></div><input type="range" id="adj-brilliance" min="-100" max="100" value="0" class="w-full"></div>
+                            <div class="space-y-1"><div class="flex justify-between font-medium text-slate-700"><span>[3] ハイライト (Highlights)</span><span id="val-highlights">0</span></div><input type="range" id="adj-highlights" min="-100" max="100" value="0" class="w-full"></div>
+                            <div class="space-y-1"><div class="flex justify-between font-medium text-slate-700"><span>[4] シャドウ (Shadows)</span><span id="val-shadows">0</span></div><input type="range" id="adj-shadows" min="-100" max="100" value="0" class="w-full"></div>
+                            <div class="space-y-1"><div class="flex justify-between font-medium text-slate-700"><span>[5] コントラスト (Contrast)</span><span id="val-contrast">0</span></div><input type="range" id="adj-contrast" min="-100" max="100" value="0" class="w-full"></div>
+                            <div class="space-y-1"><div class="flex justify-between font-medium text-slate-700"><span>[6] 明るさ (Brightness)</span><span id="val-brightness">0</span></div><input type="range" id="adj-brightness" min="-100" max="100" value="0" class="w-full"></div>
+                            <div class="space-y-1"><div class="flex justify-between font-medium text-slate-700"><span>[7] ブラックポイント (Black Point)</span><span id="val-blackPoint">0</span></div><input type="range" id="adj-blackPoint" min="-100" max="100" value="0" class="w-full"></div>
+                            <div class="space-y-1"><div class="flex justify-between font-medium text-slate-700"><span>[8] 彩度 (Saturation)</span><span id="val-saturation">0</span></div><input type="range" id="adj-saturation" min="-100" max="100" value="0" class="w-full"></div>
+                            <div class="space-y-1"><div class="flex justify-between font-medium text-slate-700"><span>[9] 自然な彩度 (Vibrance)</span><span id="val-vibrance">0</span></div><input type="range" id="adj-vibrance" min="-100" max="100" value="0" class="w-full"></div>
+                            <div class="space-y-1"><div class="flex justify-between font-medium text-slate-700"><span>[10] 暖かみ (Warmth)</span><span id="val-warmth">0</span></div><input type="range" id="adj-warmth" min="-100" max="100" value="0" class="w-full"></div>
+                            <div class="space-y-1"><div class="flex justify-between font-medium text-slate-700"><span>[11] 色合い (Tint)</span><span id="val-tint">0</span></div><input type="range" id="adj-tint" min="-100" max="100" value="0" class="w-full"></div>
+                        </div>
+                    </div>
+                    <div class="pt-2">
+                        <button id="btn-download-all" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2.5 px-4 rounded-xl shadow transition-all text-sm hidden">すべて一括ダウンロード</button>
+                    </div>
                 </div>
-                <input
-                  type="range"
-                  id="${rotSliderId}"
-                  min="-45"
-                  max="45"
-                  step="0.1"
-                  value="${item.config.rotation}"
-                  class="w-full accent-blue-600"
-                />
-              </div>
             </div>
-
-            <div class="flex justify-between items-center text-xs text-slate-600 pt-1">
-                <span class="truncate max-w-[130px] font-medium" title="${item.name}">${item.name}</span>
-                <button id="${downloadBtnId}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1 rounded-lg transition-all shadow-sm">
-                    保存
-                </button>
+            <div class="lg:col-span-2 space-y-4">
+                <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 min-h-[500px] flex flex-col">
+                    <div class="flex justify-between items-center border-b pb-3 mb-4">
+                        <h2 class="font-bold text-slate-900">処理済み画像一覧 (<span id="image-count">0</span>件)</h2>
+                        <span class="text-xs text-slate-500">※拡大中はプレビュー内をドラッグで位置移動可能</span>
+                    </div>
+                    <div id="preview-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1 scrollbar-gutter-stable">
+                        <div id="empty-state" class="col-span-full py-20 text-center text-slate-400">
+                            <svg class="w-16 h-16 mx-auto mb-3 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            <p class="text-sm">画像がまだ追されていません</p>
+                        </div>
+                    </div>
+                </div>
             </div>
-          `;
-          previewContainer.appendChild(card);
+        </div>
+    </div>
+<script>
+const dropZone = document.getElementById("drop-zone");
+const fileInput = document.getElementById("file-input");
+const previewContainer = document.getElementById("preview-container");
+const emptyState = document.getElementById("empty-state");
+const imageCount = document.getElementById("image-count");
+const btnDownloadAll = document.getElementById("btn-download-all");
+const btnResetAdjustments = document.getElementById("btn-reset-adjustments");
 
-          // イベント紐付け
-          const zoomSliderEl = document.getElementById(zoomSliderId);
-          const zoomValEl = document.getElementById(zoomValId);
-          const zoomResetEl = document.getElementById(zoomResetId);
-          const rotSliderEl = document.getElementById(rotSliderId);
-          const rotValEl = document.getElementById(rotValId);
-          const rotResetEl = document.getElementById(rotResetId);
-          const imgWrapperEl = document.getElementById(imgWrapperId);
-          const imgEl = document.getElementById(imgElId);
-          const dlBtn = document.getElementById(downloadBtnId);
+const settingsTitle = document.getElementById("settings-title");
+const targetModeBadge = document.getElementById("target-mode-badge");
+const deleteActionArea = document.getElementById("delete-action-area");
+const btnDeleteSelected = document.getElementById("btn-delete-selected");
+const btnDeleteText = document.getElementById("btn-delete-text");
 
-          if (zoomSliderEl) {
-            zoomSliderEl.addEventListener("input", (ev) => {
-              ev.stopPropagation();
-              const val = parseFloat(zoomSliderEl.value) || 0;
-              item.config.zoom = val;
-              if (zoomValEl) zoomValEl.textContent = val.toFixed(1) + "%";
+const canvasSizeInput = document.getElementById("canvas-size");
+const bgColorInput = document.getElementById("bg-color");
 
-              const updatedCanvas = generateCanvas(item, false);
-              if (imgEl)
-                imgEl.src = updatedCanvas.toDataURL("image/jpeg", 0.85);
-            });
-            zoomSliderEl.addEventListener("change", (ev) => {
-              ev.stopPropagation();
-              renderAllPreviews();
-            });
-          }
+const outerColorInput = document.getElementById("outer-color");
+const outerSizeInput = document.getElementById("outer-size");
+const outerSizeVal = document.getElementById("outer-size-val");
 
-          if (zoomResetEl) {
-            zoomResetEl.addEventListener("click", (ev) => {
-              ev.stopPropagation();
-              item.config.zoom = 0.0;
-              item.config.zoomX = 0.5;
-              item.config.zoomY = 0.5;
-              renderAllPreviews();
-            });
-          }
+const innerColorInput = document.getElementById("inner-color");
+const innerSizeInput = document.getElementById("inner-size");
+const innerSizeVal = document.getElementById("inner-size-val");
 
-          if (rotSliderEl) {
-            rotSliderEl.addEventListener("input", (ev) => {
-              ev.stopPropagation();
-              const val = parseFloat(rotSliderEl.value) || 0;
-              item.config.rotation = val;
-              if (rotValEl) rotValEl.textContent = val.toFixed(1) + "°";
+const targetScopeSelect = document.getElementById("target-scope");
+const borderAlignSelect = document.getElementById("border-align");
+const borderToggleBtn = document.getElementById("border-toggle");
+const borderSettingsPanel = document.getElementById("border-settings");
 
-              const updatedCanvas = generateCanvas(item, false);
-              if (imgEl)
-                imgEl.src = updatedCanvas.toDataURL("image/jpeg", 0.85);
-            });
-            rotSliderEl.addEventListener("change", (ev) => {
-              ev.stopPropagation();
-              renderAllPreviews();
-            });
-          }
+// モーダル要素
+const saveModal = document.getElementById("save-modal");
+const saveModalDesc = document.getElementById("save-modal-desc");
+const saveOptionsPc = document.getElementById("save-options-pc");
+const saveOptionsMobile = document.getElementById("save-options-mobile");
+const saveDownloadPc = document.getElementById("save-download-pc");
+const savePickerPc = document.getElementById("save-picker-pc");
+const savePhotoMobile = document.getElementById("save-photo-mobile");
+const saveFileMobile = document.getElementById("save-file-mobile");
+const saveModalClose = document.getElementById("save-modal-close");
+const toastContainer = document.getElementById("toast-container");
 
-          if (rotResetEl) {
-            rotResetEl.addEventListener("click", (ev) => {
-              ev.stopPropagation();
-              item.config.rotation = 0.0;
-              renderAllPreviews();
-            });
-          }
+const adjustmentKeys = [
+  "exposure", "brilliance", "highlights", "shadows", "contrast",
+  "brightness", "blackPoint", "saturation", "vibrance", "warmth", "tint"
+];
 
-          // 1.0%以上拡大している場合、プレビュー内ドラッグで座標移動
-          if (imgWrapperEl) {
-            let isDragging = false;
-            let hasDragged = false;
-            let startX = 0;
-            let startY = 0;
+const defaultAdjustments = {
+  exposure: 0, brilliance: 0, highlights: 0, shadows: 0, contrast: 0,
+  brightness: 0, blackPoint: 0, saturation: 0, vibrance: 0, warmth: 0, tint: 0
+};
 
-            imgWrapperEl.addEventListener("mousedown", (ev) => {
-              if (item.config.zoom < 1.0) return;
-              ev.stopPropagation();
-              ev.preventDefault();
-              isDragging = true;
-              hasDragged = false;
-              startX = ev.clientX;
-              startY = ev.clientY;
-              imgWrapperEl.classList.add("cursor-grabbing");
-            });
+let globalSettings = {
+  canvasSize: 1200, bgColor: "#FFFFFF", outerColor: "#F58220", outerSize: 30,
+  innerColor: "#FFFFFF", innerSize: 30, targetScope: "image", borderAlign: "outside",
+  borderEnabled: true,
+  adjustments: { ...defaultAdjustments }, zoom: 0.0, zoomX: 0.5, zoomY: 0.5, rotation: 0.0
+};
 
-            const onMouseMove = (ev) => {
-              if (!isDragging) return;
-              const dx = ev.clientX - startX;
-              const dy = ev.clientY - startY;
-              if (Math.abs(dx) > 2 || Math.abs(dy) > 2) {
-                hasDragged = true;
-              }
-              startX = ev.clientX;
-              startY = ev.clientY;
+let uploadedFiles = [];
+let selectedImageIds = [];
+let renderTimer = null;
 
-              const rect = imgWrapperEl.getBoundingClientRect();
-              const scaleFactor = 1 + item.config.zoom / 100;
-              const moveFactorX = 1 / (rect.width * (scaleFactor - 1));
-              const moveFactorY = 1 / (rect.height * (scaleFactor - 1));
+// 保存モーダルの状態
+let saveModalTarget = null; // null = 一括, item = 個別
 
-              item.config.zoomX = Math.max(
-                0,
-                Math.min(1, item.config.zoomX - dx * moveFactorX),
-              );
-              item.config.zoomY = Math.max(
-                0,
-                Math.min(1, item.config.zoomY - dy * moveFactorY),
-              );
+// デバイス判定（タッチありでかつポインタ精度が粗い＝モバイルとみなす簡易判定）
+const isMobile = () => {
+  const hasTouch = "ontouchstart" in window || navigator.maxTouchPoints > 0;
+  const coarse = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+  return hasTouch && coarse;
+};
 
-              const updatedCanvas = generateCanvas(item, false);
-              if (imgEl)
-                imgEl.src = updatedCanvas.toDataURL("image/jpeg", 0.85);
-            };
+// トグルUI更新
+function updateBorderToggleUI(enabled) {
+  if (enabled) {
+    borderToggleBtn.classList.remove("off");
+    borderToggleBtn.classList.add("on");
+    borderToggleBtn.setAttribute("aria-pressed", "true");
+    borderSettingsPanel.classList.remove("hidden");
+  } else {
+    borderToggleBtn.classList.remove("on");
+    borderToggleBtn.classList.add("off");
+    borderToggleBtn.setAttribute("aria-pressed", "false");
+    borderSettingsPanel.classList.add("hidden");
+  }
+}
 
-            const onMouseUp = () => {
-              if (!isDragging) return;
-              isDragging = false;
-              imgWrapperEl.classList.remove("cursor-grabbing");
-              if (hasDragged) {
-                renderAllPreviews();
-              }
-            };
+borderToggleBtn.addEventListener("click", () => {
+  const next = borderToggleBtn.classList.contains("off");
+  updateBorderToggleUI(next);
+  handleSettingChange(true, ["borderEnabled"]);
+});
 
-            window.addEventListener("mousemove", onMouseMove);
-            window.addEventListener("mouseup", onMouseUp);
-          }
+outerSizeInput.addEventListener("input", () => {
+  outerSizeVal.textContent = outerSizeInput.value + "px";
+  handleSettingChange(false);
+});
+innerSizeInput.addEventListener("input", () => {
+  innerSizeVal.textContent = innerSizeInput.value + "px";
+  handleSettingChange(false);
+});
 
-          if (dlBtn) {
-            dlBtn.onclick = (ev) => {
-              ev.stopPropagation();
-              const fullCanvas = generateCanvas(item, true);
-              const fullDataUrl = fullCanvas.toDataURL("image/jpeg", 0.92);
-              const a = document.createElement("a");
-              a.href = fullDataUrl;
-              a.download = `${item.config.canvasSize}_${item.name.replace(/\.[^/.]+$/, "")}.jpg`;
-              a.click();
-            };
-          }
+[canvasSizeInput, targetScopeSelect, borderAlignSelect].forEach((el) => {
+  el.addEventListener("change", () => handleSettingChange(true));
+});
+
+[bgColorInput, outerColorInput, innerColorInput].forEach((el) => {
+  el.addEventListener("input", () => handleSettingChange(false));
+  el.addEventListener("change", () => handleSettingChange(true));
+});
+
+adjustmentKeys.forEach((key) => {
+  const slider = document.getElementById(`adj-${key}`);
+  const valSpan = document.getElementById(`val-${key}`);
+  if (slider && valSpan) {
+    slider.addEventListener("input", () => {
+      valSpan.textContent = slider.value;
+      handleSettingChange(false);
+    });
+    slider.addEventListener("change", () => handleSettingChange(true));
+  }
+});
+
+btnResetAdjustments.addEventListener("click", () => {
+  adjustmentKeys.forEach((key) => {
+    const slider = document.getElementById(`adj-${key}`);
+    const valSpan = document.getElementById(`val-${key}`);
+    if (slider) slider.value = 0;
+    if (valSpan) valSpan.textContent = "0";
+  });
+  handleSettingChange(true, ["adjustments"]);
+});
+
+btnDeleteSelected.addEventListener("click", () => {
+  if (selectedImageIds.length === 0) return;
+  uploadedFiles = uploadedFiles.filter((item) => !selectedImageIds.includes(item.id));
+  selectedImageIds = [];
+  updateImageCount();
+  updateUIForSelection();
+  syncFormWithConfig(globalSettings);
+  renderAllPreviews();
+});
+
+document.addEventListener("click", (e) => {
+  if (selectedImageIds.length === 0) return;
+  const isCard = e.target.closest(".image-card");
+  const isSettings = e.target.closest("#settings-panel");
+  const isDropZone = e.target.closest("#drop-zone");
+  const isModal = e.target.closest("#save-modal");
+  if (!isCard && !isSettings && !isDropZone && !isModal) resetToGlobalMode();
+});
+
+function resetToGlobalMode() {
+  selectedImageIds = [];
+  updateUIForSelection();
+  syncFormWithConfig(globalSettings);
+  renderAllPreviews();
+}
+
+dropZone.addEventListener("click", () => fileInput.click());
+dropZone.addEventListener("dragover", (e) => { e.preventDefault(); dropZone.classList.add("bg-blue-100"); });
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("bg-blue-100"));
+dropZone.addEventListener("drop", (e) => {
+  e.preventDefault(); dropZone.classList.remove("bg-blue-100");
+  if (e.dataTransfer.files.length > 0) handleFiles(e.dataTransfer.files);
+});
+fileInput.addEventListener("change", (e) => {
+  if (e.target.files.length > 0) handleFiles(e.target.files);
+});
+
+function handleFiles(files) {
+  for (let file of files) {
+    if (!file.type.startsWith("image/")) continue;
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        uploadedFiles.push({
+          id: "img_" + Date.now() + "_" + Math.random().toString(36).substr(2, 9),
+          file: file, name: file.name, img: img,
+          config: JSON.parse(JSON.stringify(globalSettings))
         });
-        fitPreviewHeight();
-      }
-
-      // ==========================================
-      // 画像生成 ＆ 色調補正 ＆ 傾き補正(クリッピングマスキング)パイプライン
-      // ==========================================
-      function generateCanvas(item, isFullResolution = false) {
-        const cfg = item.config;
-        const targetCanvasSize = cfg.canvasSize || 1200;
-        const renderSize = isFullResolution
-          ? targetCanvasSize
-          : Math.min(800, targetCanvasSize);
-
-        const sourceCanvas = document.createElement("canvas");
-        let srcW = item.img.width;
-        let srcH = item.img.height;
-
-        if (!isFullResolution) {
-          const maxDim = Math.max(srcW, srcH);
-          if (maxDim > 800) {
-            const scale = 800 / maxDim;
-            srcW = Math.round(srcW * scale);
-            srcH = Math.round(srcH * scale);
-          }
-        }
-
-        sourceCanvas.width = srcW;
-        sourceCanvas.height = srcH;
-        const sCtx = sourceCanvas.getContext("2d", {
-          willReadFrequently: true,
-        });
-
-        // 1. ズーム倍率に応じたクロップ描画
-        const zoomRate = cfg.zoom || 0;
-        if (zoomRate > 0) {
-          const scaleFactor = 1 + zoomRate / 100;
-          const origW = item.img.width;
-          const origH = item.img.height;
-          const cropW = origW / scaleFactor;
-          const cropH = origH / scaleFactor;
-          const zx = cfg.zoomX !== undefined ? cfg.zoomX : 0.5;
-          const zy = cfg.zoomY !== undefined ? cfg.zoomY : 0.5;
-          const cropX = (origW - cropW) * zx;
-          const cropY = (origH - cropH) * zy;
-
-          sCtx.drawImage(
-            item.img,
-            cropX,
-            cropY,
-            cropW,
-            cropH,
-            0,
-            0,
-            srcW,
-            srcH,
-          );
-        } else {
-          sCtx.drawImage(item.img, 0, 0, srcW, srcH);
-        }
-
-        // 2. 色調補正の適用
-        if (hasAnyAdjustment(cfg.adjustments)) {
-          applyColorAdjustments(
-            sCtx,
-            srcW,
-            srcH,
-            cfg.adjustments,
-            isFullResolution,
-          );
-        }
-
-        // 3. 最終キャンバスへの描画 ＆ 傾き補正 (回転マスキング)
-        const canvas = document.createElement("canvas");
-        canvas.width = renderSize;
-        canvas.height = renderSize;
-        const ctx = canvas.getContext("2d");
-
-        ctx.fillStyle = cfg.bgColor;
-        ctx.fillRect(0, 0, renderSize, renderSize);
-
-        const totalBorderSize = Math.round(
-          (cfg.outerSize + cfg.innerSize) * (renderSize / targetCanvasSize),
-        );
-        const outerSz = Math.round(
-          cfg.outerSize * (renderSize / targetCanvasSize),
-        );
-        const innerSz = Math.round(
-          cfg.innerSize * (renderSize / targetCanvasSize),
-        );
-
-        let baseBox = { x: 0, y: 0, w: renderSize, h: renderSize };
-        let drawW = 0,
-          drawH = 0,
-          drawX = 0,
-          drawY = 0;
-
-        // 描画サイズの計算
-        if (cfg.targetScope === "image" && cfg.borderAlign === "outside") {
-          const maxAllowedSize = Math.max(10, renderSize - totalBorderSize * 2);
-          const scale = maxAllowedSize / Math.max(srcW, srcH);
-          drawW = srcW * scale;
-          drawH = srcH * scale;
-          drawX = (renderSize - drawW) / 2;
-          drawY = (renderSize - drawH) / 2;
-          baseBox = { x: drawX, y: drawY, w: drawW, h: drawH };
-        } else if (
-          cfg.targetScope === "image" &&
-          cfg.borderAlign === "inside"
-        ) {
-          const scale = renderSize / Math.max(srcW, srcH);
-          drawW = srcW * scale;
-          drawH = srcH * scale;
-          drawX = (renderSize - drawW) / 2;
-          drawY = (renderSize - drawH) / 2;
-          baseBox = { x: drawX, y: drawY, w: drawW, h: drawH };
-        } else if (
-          cfg.targetScope === "canvas" &&
-          cfg.borderAlign === "outside"
-        ) {
-          const innerCanvasSize = Math.max(
-            10,
-            renderSize - totalBorderSize * 2,
-          );
-          const scale = innerCanvasSize / Math.max(srcW, srcH);
-          drawW = srcW * scale;
-          drawH = srcH * scale;
-          const offsetX = (renderSize - innerCanvasSize) / 2;
-          const offsetY = (renderSize - innerCanvasSize) / 2;
-          drawX = offsetX + (innerCanvasSize - drawW) / 2;
-          drawY = offsetY + (innerCanvasSize - drawH) / 2;
-          baseBox = {
-            x: offsetX,
-            y: offsetY,
-            w: innerCanvasSize,
-            h: innerCanvasSize,
-          };
-        } else if (
-          cfg.targetScope === "canvas" &&
-          cfg.borderAlign === "inside"
-        ) {
-          const scale = renderSize / Math.max(srcW, srcH);
-          drawW = srcW * scale;
-          drawH = srcH * scale;
-          drawX = (renderSize - drawW) / 2;
-          drawY = (renderSize - drawH) / 2;
-          baseBox = { x: 0, y: 0, w: renderSize, h: renderSize };
-        }
-
-        // 回転描画 ＆ 枠内クリッピング（はみ出し部分の自動マスキング）
-        ctx.save();
-        ctx.beginPath();
-        ctx.rect(drawX, drawY, drawW, drawH);
-        ctx.clip(); // 描画エリア（ベースボックス）の外側をマスクする
-
-        ctx.translate(drawX + drawW / 2, drawY + drawH / 2);
-        const rotDeg = cfg.rotation || 0;
-        // 傾きに連動したズーム（iPhone写真アプリ風）：
-        // 回転後の画像が描画枠を完全に覆う最小の拡大率を計算し、余白を映さない
-        let rotZoom = 1;
-        if (rotDeg !== 0) {
-          const rad = (Math.abs(rotDeg) * Math.PI) / 180;
-          const cosA = Math.cos(rad);
-          const sinA = Math.sin(rad);
-          rotZoom = Math.max(
-            cosA + (drawH / drawW) * sinA,
-            cosA + (drawW / drawH) * sinA,
-          );
-          ctx.rotate((rotDeg * Math.PI) / 180);
-          ctx.scale(rotZoom, rotZoom);
-        }
-        ctx.drawImage(
-          sourceCanvas,
-          0,
-          0,
-          srcW,
-          srcH,
-          -drawW / 2,
-          -drawH / 2,
-          drawW,
-          drawH,
-        );
-        ctx.restore();
-
-        // フチの描画
-        if (cfg.targetScope === "image" && cfg.borderAlign === "outside") {
-          drawOutsideBorders(
-            ctx,
-            baseBox,
-            cfg.outerColor,
-            outerSz,
-            cfg.innerColor,
-            innerSz,
-          );
-        } else if (
-          cfg.targetScope === "image" &&
-          cfg.borderAlign === "inside"
-        ) {
-          drawInsideBorders(
-            ctx,
-            baseBox,
-            cfg.outerColor,
-            outerSz,
-            cfg.innerColor,
-            innerSz,
-          );
-        } else if (
-          cfg.targetScope === "canvas" &&
-          cfg.borderAlign === "outside"
-        ) {
-          drawOutsideBorders(
-            ctx,
-            baseBox,
-            cfg.outerColor,
-            outerSz,
-            cfg.innerColor,
-            innerSz,
-          );
-        } else if (
-          cfg.targetScope === "canvas" &&
-          cfg.borderAlign === "inside"
-        ) {
-          drawInsideBorders(
-            ctx,
-            baseBox,
-            cfg.outerColor,
-            outerSz,
-            cfg.innerColor,
-            innerSz,
-          );
-        }
-
-        return canvas;
-      }
-
-      function hasAnyAdjustment(adj) {
-        if (!adj) return false;
-        return Object.values(adj).some((val) => val !== 0);
-      }
-
-      // ==========================================
-      // 色調補正エンジン
-      // ==========================================
-      function applyColorAdjustments(
-        ctx,
-        width,
-        height,
-        adj,
-        isFullResolution,
-      ) {
-        const imgData = ctx.getImageData(0, 0, width, height);
-        const data = imgData.data;
-        const len = data.length;
-
-        const exposure = (adj.exposure || 0) / 100;
-        const brilliance = (adj.brilliance || 0) / 100;
-        const highlights = (adj.highlights || 0) / 100;
-        const shadows = (adj.shadows || 0) / 100;
-        const contrastVal = (adj.contrast || 0) / 100;
-        const contrastScale =
-          contrastVal >= 0 ? 1.0 + contrastVal * 1.5 : 1.0 + contrastVal * 0.7;
-        const brightness = (adj.brightness || 0) / 100;
-        const blackPoint = (adj.blackPoint || 0) / 100;
-        const saturation = (adj.saturation || 0) / 100;
-        const vibrance = (adj.vibrance || 0) / 100;
-
-        let brilLow = null;
-        let brilLut = null;
-        const exposureLut = exposure !== 0 ? buildExposureLut(exposure) : null;
-        const brilExp = exposure !== 0 ? Math.pow(2, exposure * 2.0) : 1.0;
-        if (brilliance > 0 || shadows > 0)
-          brilLow = buildBrillianceLowFreq(data, width, height);
-        if (brilliance > 0)
-          brilLut = buildBrillianceLut(Math.min(1, brilliance));
-        const shadowLut = shadows !== 0 ? buildShadowLut(shadows) : null;
-        const highlightLut =
-          highlights !== 0
-            ? buildToneLut(
-                highlights > 0 ? HIGHLIGHT_MAX : HIGHLIGHT_MIN,
-                Math.min(1, Math.abs(highlights)),
-              )
-            : null;
-        const brightLut =
-          brightness !== 0 ? buildBrightnessLut(brightness) : null;
-        const blackPointLut =
-          blackPoint !== 0 ? buildBlackPointLut(blackPoint) : null;
-        const saturationLut =
-          saturation > 0 ? buildSaturationLut(saturation) : null;
-
-        for (let i = 0; i < len; i += 4) {
-          let r = data[i] / 255;
-          let g = data[i + 1] / 255;
-          let b = data[i + 2] / 255;
-
-          let luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-
-          if (exposureLut) {
-            r = exposureLut[Math.min(1024, Math.max(0, Math.round(r * 1024)))];
-            g = exposureLut[Math.min(1024, Math.max(0, Math.round(g * 1024)))];
-            b = exposureLut[Math.min(1024, Math.max(0, Math.round(b * 1024)))];
-            luminance = 0.299 * r + 0.587 * g + 0.114 * b;
-          }
-
-          if (brilliance !== 0) {
-            if (brilliance < 0) {
-              const bDown = Math.abs(brilliance);
-              r = r + bDown * 1.5 * (r - 0.5) * Math.abs(r - 0.5);
-              g = g + bDown * 1.5 * (g - 0.5) * Math.abs(g - 0.5);
-              b = b + bDown * 1.5 * (b - 0.5) * Math.abs(b - 0.5);
-            } else {
-              const rc = Math.min(1, Math.max(0, r));
-              const gc = Math.min(1, Math.max(0, g));
-              const bc = Math.min(1, Math.max(0, b));
-              const yIn = 0.299 * rc + 0.587 * gc + 0.114 * bc;
-
-              const px = i >> 2;
-              const py = (px / width) | 0;
-              const fx = Math.min(
-                brilLow.gw - 1,
-                Math.max(0, (px - py * width + 0.5) / brilLow.scale - 0.5),
-              );
-              const fy = Math.min(
-                brilLow.gh - 1,
-                Math.max(0, (py + 0.5) / brilLow.scale - 0.5),
-              );
-              const x0 = fx | 0,
-                y0 = fy | 0;
-              const x1 = Math.min(brilLow.gw - 1, x0 + 1),
-                y1 = Math.min(brilLow.gh - 1, y0 + 1);
-              const tx = fx - x0,
-                ty = fy - y0;
-              const gr = brilLow.grid,
-                gw2 = brilLow.gw;
-              const lowRaw =
-                (gr[y0 * gw2 + x0] * (1 - tx) + gr[y0 * gw2 + x1] * tx) *
-                  (1 - ty) +
-                (gr[y1 * gw2 + x0] * (1 - tx) + gr[y1 * gw2 + x1] * tx) * ty;
-              const low = Math.min(1, Math.max(0, lowRaw * brilExp));
-
-              const li = Math.round(low * 1024);
-              const yOut = brilLut.f[li] + brilLut.k[li] * (yIn - low);
-              const cs = brilLut.c[li];
-              r = Math.min(1, Math.max(0, yOut + cs * (rc - yIn)));
-              g = Math.min(1, Math.max(0, yOut + cs * (gc - yIn)));
-              b = Math.min(1, Math.max(0, yOut + cs * (bc - yIn)));
-            }
-          }
-
-          if (highlights !== 0) {
-            const rc = Math.min(1, Math.max(0, r));
-            const gc = Math.min(1, Math.max(0, g));
-            const bc = Math.min(1, Math.max(0, b));
-            const yIn = 0.299 * rc + 0.587 * gc + 0.114 * bc;
-            const hi = Math.round(yIn * 1024);
-            const yOut = highlightLut.f[hi];
-            const kc = highlightLut.k[hi];
-            r = Math.min(1, Math.max(0, yOut + kc * (rc - yIn)));
-            g = Math.min(1, Math.max(0, yOut + kc * (gc - yIn)));
-            b = Math.min(1, Math.max(0, yOut + kc * (bc - yIn)));
-          }
-
-          if (shadows !== 0) {
-            const rc = Math.min(1, Math.max(0, r));
-            const gc = Math.min(1, Math.max(0, g));
-            const bc = Math.min(1, Math.max(0, b));
-            const yIn = 0.299 * rc + 0.587 * gc + 0.114 * bc;
-            const si = Math.round(yIn * 1024);
-            let yOut = shadowLut.f[si];
-            if (shadowLut.local) {
-              const yRaw =
-                (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) /
-                255;
-              const lowRaw = sampleLowFreq(brilLow, i >> 2, width);
-              yOut += shadowLut.b[si] * (lowRaw - yRaw) * brilExp;
-            }
-            const kc = shadowLut.k[si];
-            r = Math.min(1, Math.max(0, yOut + kc * (rc - yIn)));
-            g = Math.min(1, Math.max(0, yOut + kc * (gc - yIn)));
-            b = Math.min(1, Math.max(0, yOut + kc * (bc - yIn)));
-          }
-
-          if (contrastVal !== 0) {
-            r = (r - 0.5) * contrastScale + 0.5;
-            g = (g - 0.5) * contrastScale + 0.5;
-            b = (b - 0.5) * contrastScale + 0.5;
-          }
-
-          if (brightness !== 0) {
-            const rc = Math.min(1, Math.max(0, r));
-            const gc = Math.min(1, Math.max(0, g));
-            const bc = Math.min(1, Math.max(0, b));
-            const yIn = 0.299 * rc + 0.587 * gc + 0.114 * bc;
-            const bi = Math.round(yIn * 1024);
-            const yOut = brightLut.f[bi];
-            const kc = brightLut.k[bi];
-            r = Math.min(1, Math.max(0, yOut + kc * (rc - yIn)));
-            g = Math.min(1, Math.max(0, yOut + kc * (gc - yIn)));
-            b = Math.min(1, Math.max(0, yOut + kc * (bc - yIn)));
-          }
-
-          if (blackPoint !== 0) {
-            r = blackPointLut[Math.round(Math.min(1, Math.max(0, r)) * 1024)];
-            g = blackPointLut[Math.round(Math.min(1, Math.max(0, g)) * 1024)];
-            b = blackPointLut[Math.round(Math.min(1, Math.max(0, b)) * 1024)];
-          }
-
-          if (saturation !== 0) {
-            const rc = Math.min(1, Math.max(0, r));
-            const gc = Math.min(1, Math.max(0, g));
-            const bc = Math.min(1, Math.max(0, b));
-            const rl = SRGB_TO_LIN[Math.round(rc * 1024)];
-            const gl = SRGB_TO_LIN[Math.round(gc * 1024)];
-            const bl = SRGB_TO_LIN[Math.round(bc * 1024)];
-            const ml = (rl + gl + bl) / 3;
-            let k = 1 + saturation;
-            if (saturation > 0) {
-              k =
-                saturationLut.a[
-                  Math.round(LIN_TO_SRGB[Math.round(ml * 4096)] * 1024)
-                ];
-              const mx = Math.max(rc, gc, bc);
-              const d = mx - Math.min(rc, gc, bc);
-              if (d > 1e-6) {
-                let pos;
-                if (mx === rc) pos = ((((gc - bc) / d) % 6) + 6) % 6;
-                else if (mx === gc) pos = (bc - rc) / d + 2;
-                else pos = (rc - gc) / d + 4;
-                const i0 = Math.floor(pos) % 6;
-                const tt = pos - Math.floor(pos);
-                const hh =
-                  saturationLut.h[i0] * (1 - tt) +
-                  saturationLut.h[(i0 + 1) % 6] * tt;
-                k *= 1 + (hh - 1) * Math.min(1, d / mx / 0.08);
-              }
-            }
-            r =
-              LIN_TO_SRGB[
-                Math.round(Math.min(1, Math.max(0, ml + k * (rl - ml))) * 4096)
-              ];
-            g =
-              LIN_TO_SRGB[
-                Math.round(Math.min(1, Math.max(0, ml + k * (gl - ml))) * 4096)
-              ];
-            b =
-              LIN_TO_SRGB[
-                Math.round(Math.min(1, Math.max(0, ml + k * (bl - ml))) * 4096)
-              ];
-          }
-
-          if (vibrance !== 0) {
-            const rc = Math.min(1, Math.max(0, r));
-            const gc = Math.min(1, Math.max(0, g));
-            const bc = Math.min(1, Math.max(0, b));
-            const rl = SRGB_TO_LIN[Math.round(rc * 1024)];
-            const gl = SRGB_TO_LIN[Math.round(gc * 1024)];
-            const bl = SRGB_TO_LIN[Math.round(bc * 1024)];
-            const lum = 0.299 * rl + 0.587 * gl + 0.114 * bl;
-            const max = Math.max(rl, gl, bl);
-            const min = Math.min(rl, gl, bl);
-            const sat = max === 0 ? 0 : (max - min) / max;
-            let factor;
-            if (vibrance > 0) {
-              factor = 1 + vibrance * Math.pow(1 - sat, 0.7) * 1.3;
-            } else {
-              factor = 1 + vibrance * 0.9;
-            }
-            const rl2 = lum + (rl - lum) * factor;
-            const gl2 = lum + (gl - lum) * factor;
-            const bl2 = lum + (bl - lum) * factor;
-            r = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, rl2)) * 4096)];
-            g = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, gl2)) * 4096)];
-            b = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, bl2)) * 4096)];
-          }
-
-          data[i] = Math.min(255, Math.max(0, r * 255));
-          data[i + 1] = Math.min(255, Math.max(0, g * 255));
-          data[i + 2] = Math.min(255, Math.max(0, b * 255));
-        }
-
-        ctx.putImageData(imgData, 0, 0);
-      }
-
-      // ヘルパー群
-      // [8] 彩度: 線形光でRGB平均を基準に色差をk倍する。−側は k=1+スライダー値（−100で完全なグレー）。
-      // ＋側は実機画像から逆算した「輝度別ゲインA × 色相別係数H」（暗部ほど強く、赤・マゼンタはやや弱く、緑〜シアンはやや強い）
-      const SRGB_TO_LIN = new Float32Array(1025);
-      const LIN_TO_SRGB = new Float32Array(4097);
-      for (let i = 0; i <= 1024; i++) {
-        const c = i / 1024;
-        SRGB_TO_LIN[i] =
-          c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-      }
-      for (let i = 0; i <= 4096; i++) {
-        const l = i / 4096;
-        LIN_TO_SRGB[i] =
-          l <= 0.0031308 ? l * 12.92 : 1.055 * Math.pow(l, 1 / 2.4) - 0.055;
-      }
-
-      const SATURATION_LEVELS = [0, 25, 50, 75, 100];
-      const SATURATION_A = [
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [
-          1.73, 1.57, 1.52, 1.37, 1.32, 1.27, 1.22, 1.17, 1.12, 1.07, 1.07,
-          1.12,
-        ],
-        [2.55, 2.15, 2, 1.75, 1.7, 1.6, 1.45, 1.3, 1.2, 1.15, 1.1, 1.2],
-        [3.26, 2.96, 2.66, 2.31, 2.16, 2.01, 1.91, 1.71, 1.61, 1.45, 1.4, 1.56],
-        [
-          3.28, 3.03, 2.84, 2.44, 2.49, 2.34, 2.19, 1.99, 1.84, 1.74, 1.74,
-          1.84,
-        ],
-      ];
-      const SATURATION_H = [
-        [1, 1, 1, 1, 1, 1],
-        [0.83, 0.92, 1.17, 1.1, 1.06, 0.92],
-        [0.71, 0.88, 1.28, 1.18, 1.07, 0.89],
-        [0.72, 0.99, 1.28, 1.12, 1.02, 0.89],
-        [0.78, 1.03, 1.26, 1.11, 0.93, 0.89],
-      ];
-
-      function buildSaturationLut(saturation) {
-        const s = Math.min(100, Math.max(0, saturation * 100));
-        let li = 0;
-        while (
-          li < SATURATION_LEVELS.length - 2 &&
-          s > SATURATION_LEVELS[li + 1]
-        )
-          li++;
-        const t =
-          (s - SATURATION_LEVELS[li]) /
-          (SATURATION_LEVELS[li + 1] - SATURATION_LEVELS[li]);
-        const mix = (tbl) =>
-          tbl[li].map((v, j) => v + (tbl[li + 1][j] - v) * t);
-        const A = mix(SATURATION_A);
-        const a = new Float32Array(1025);
-        for (let i = 0; i <= 1024; i++) {
-          const pos = Math.min(
-            A.length - 1,
-            Math.max(0, (i / 1024) * A.length - 0.5),
-          );
-          const j = Math.min(A.length - 2, Math.floor(pos));
-          a[i] = A[j] + (A[j + 1] - A[j]) * (pos - j);
-        }
-        return { a, h: mix(SATURATION_H) };
-      }
-      const BLACKPOINT_LEVELS = [-100, -75, -50, -25, 0, 25, 50, 75, 100];
-      const BLACKPOINT_F = [
-        [
-          0.243, 0.247, 0.254, 0.263, 0.274, 0.289, 0.305, 0.323, 0.343, 0.364,
-          0.386, 0.41, 0.434, 0.459, 0.485, 0.512, 0.538, 0.567, 0.594, 0.621,
-          0.649, 0.679, 0.707, 0.734, 0.765, 0.793, 0.823, 0.851, 0.883, 0.91,
-          0.942, 0.968, 1,
-        ],
-        [
-          0.212, 0.216, 0.224, 0.234, 0.248, 0.263, 0.282, 0.301, 0.323, 0.346,
-          0.371, 0.396, 0.422, 0.447, 0.474, 0.501, 0.529, 0.559, 0.586, 0.614,
-          0.645, 0.673, 0.703, 0.731, 0.762, 0.79, 0.82, 0.851, 0.879, 0.91,
-          0.941, 0.968, 1,
-        ],
-        [
-          0.173, 0.178, 0.188, 0.201, 0.217, 0.234, 0.256, 0.277, 0.301, 0.326,
-          0.352, 0.379, 0.406, 0.433, 0.462, 0.492, 0.52, 0.55, 0.578, 0.609,
-          0.637, 0.669, 0.697, 0.727, 0.758, 0.789, 0.816, 0.848, 0.879, 0.91,
-          0.938, 0.968, 1,
-        ],
-        [
-          0.118, 0.126, 0.141, 0.158, 0.178, 0.199, 0.225, 0.251, 0.278, 0.305,
-          0.333, 0.363, 0.391, 0.422, 0.449, 0.481, 0.512, 0.54, 0.57, 0.601,
-          0.633, 0.662, 0.692, 0.723, 0.754, 0.785, 0.816, 0.847, 0.875, 0.906,
-          0.938, 0.968, 1,
-        ],
-        [
-          0, 0.031, 0.062, 0.094, 0.125, 0.156, 0.188, 0.219, 0.25, 0.281,
-          0.312, 0.344, 0.375, 0.406, 0.438, 0.469, 0.5, 0.531, 0.562, 0.594,
-          0.625, 0.656, 0.688, 0.719, 0.75, 0.781, 0.812, 0.844, 0.875, 0.906,
-          0.938, 0.969, 1,
-        ],
-        [
-          0, 0, 0, 0.001, 0.055, 0.106, 0.15, 0.187, 0.225, 0.258, 0.293, 0.328,
-          0.36, 0.394, 0.426, 0.457, 0.492, 0.524, 0.555, 0.586, 0.621, 0.653,
-          0.684, 0.715, 0.747, 0.777, 0.809, 0.844, 0.875, 0.906, 0.938, 0.968,
-          1,
-        ],
-        [
-          0, 0, 0, 0, 0, 0, 0.056, 0.126, 0.178, 0.22, 0.262, 0.3, 0.338, 0.373,
-          0.409, 0.443, 0.476, 0.512, 0.545, 0.578, 0.613, 0.646, 0.676, 0.711,
-          0.743, 0.773, 0.809, 0.84, 0.871, 0.902, 0.938, 0.968, 1,
-        ],
-        [
-          0, 0, 0, 0, 0, 0, 0, 0.029, 0.123, 0.182, 0.233, 0.275, 0.318, 0.355,
-          0.393, 0.429, 0.465, 0.501, 0.535, 0.57, 0.605, 0.637, 0.672, 0.705,
-          0.739, 0.771, 0.805, 0.836, 0.871, 0.902, 0.934, 0.968, 1,
-        ],
-        [
-          0, 0, 0, 0, 0, 0, 0, 0, 0.023, 0.127, 0.194, 0.246, 0.293, 0.335,
-          0.376, 0.414, 0.454, 0.49, 0.526, 0.561, 0.597, 0.633, 0.665, 0.699,
-          0.734, 0.768, 0.801, 0.835, 0.867, 0.902, 0.934, 0.967, 1,
-        ],
-      ];
-
-      function buildBlackPointLut(blackPoint) {
-        const s = Math.min(100, Math.max(-100, blackPoint * 100));
-        let li = 0;
-        while (
-          li < BLACKPOINT_LEVELS.length - 2 &&
-          s > BLACKPOINT_LEVELS[li + 1]
-        )
-          li++;
-        const t =
-          (s - BLACKPOINT_LEVELS[li]) /
-          (BLACKPOINT_LEVELS[li + 1] - BLACKPOINT_LEVELS[li]);
-        const F = BLACKPOINT_F[li].map(
-          (v, j) => v + (BLACKPOINT_F[li + 1][j] - v) * t,
-        );
-        const n = 1024;
-        const lut = new Float32Array(n + 1);
-        for (let i = 0; i <= n; i++) lut[i] = lerpUniform(F, i / n);
-        return lut;
-      }
-
-      const BRIGHT_MAX = {
-        fx: [0.0, 0.039, 0.322, 0.463, 0.592, 0.714, 0.831, 0.945, 1.0],
-        fy: [0.0, 0.068, 0.453, 0.627, 0.767, 0.874, 0.952, 0.995, 1.0],
-        kx: [0.0, 0.021, 0.812, 0.979, 1.0],
-        ky: [1.3, 1.3, 0.7, 0.37, 0.37],
+        updateImageCount(); renderAllPreviews();
       };
-      const BRIGHT_MIN = {
-        fx: [0.0, 0.404, 0.498, 0.678, 0.835, 1.0],
-        fy: [0.0, 0.007, 0.155, 0.426, 0.689, 0.995],
-        kx: [0.0, 0.021, 0.146, 0.396, 0.521, 0.604, 0.771, 0.896, 0.979, 1.0],
-        ky: [0.55, 0.55, 0.47, 1.37, 1.45, 1.7, 1.62, 1.72, 1.62, 1.62],
-      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  }
+}
 
-      function interpKnots(xs, ys, v) {
-        let s = 0;
-        while (s < xs.length - 2 && v > xs[s + 1]) s++;
-        const t = (v - xs[s]) / (xs[s + 1] - xs[s]);
-        return ys[s] + (ys[s + 1] - ys[s]) * Math.min(1, Math.max(0, t));
-      }
+function updateImageCount() {
+  imageCount.textContent = uploadedFiles.length;
+  if (uploadedFiles.length > 0) {
+    emptyState.style.display = "none"; btnDownloadAll.classList.remove("hidden");
+  } else {
+    emptyState.style.display = "block"; btnDownloadAll.classList.add("hidden");
+  }
+}
 
-      function buildToneLut(t, p) {
-        const n = 1024;
-        const f = new Float32Array(n + 1);
-        const k = new Float32Array(n + 1);
-        for (let i = 0; i <= n; i++) {
-          const y = i / n;
-          f[i] = y + p * (interpKnots(t.fx, t.fy, y) - y);
-          k[i] = 1 + p * (interpKnots(t.kx, t.ky, y) - 1);
-        }
-        return { f, k };
-      }
+function collectCurrentFormConfig() {
+  const adj = {};
+  adjustmentKeys.forEach((key) => {
+    const slider = document.getElementById(`adj-${key}`);
+    adj[key] = slider ? parseInt(slider.value) || 0 : 0;
+  });
+  return {
+    canvasSize: parseInt(canvasSizeInput.value) || 1200,
+    bgColor: bgColorInput.value,
+    outerColor: outerColorInput.value,
+    outerSize: parseInt(outerSizeInput.value) || 0,
+    innerColor: innerColorInput.value,
+    innerSize: parseInt(innerSizeInput.value) || 0,
+    targetScope: targetScopeSelect.value,
+    borderAlign: borderAlignSelect.value,
+    borderEnabled: borderToggleBtn.classList.contains("on"),
+    adjustments: adj
+  };
+}
 
-      function buildBrightnessLut(brightness) {
-        return buildToneLut(
-          brightness > 0 ? BRIGHT_MAX : BRIGHT_MIN,
-          Math.min(1, Math.abs(brightness)),
-        );
-      }
+let lastFormConfig = collectCurrentFormConfig();
 
-      const SHADOW_LEVELS = [-100, -75, -50, -25, 0, 25, 50, 75, 100];
-      const SHADOW_F = [
-        [
-          0, 0, 0, 0, 0.092, 0.222, 0.314, 0.395, 0.47, 0.543, 0.613, 0.688,
-          0.75, 0.812, 0.875, 0.938, 1,
-        ],
-        [
-          0, 0, 0, 0.002, 0.148, 0.248, 0.33, 0.406, 0.477, 0.547, 0.617, 0.688,
-          0.75, 0.812, 0.875, 0.938, 1,
-        ],
-        [
-          0, 0.019, 0.056, 0.099, 0.188, 0.271, 0.346, 0.417, 0.484, 0.552,
-          0.619, 0.688, 0.75, 0.812, 0.875, 0.938, 1,
-        ],
-        [
-          0.004, 0.048, 0.105, 0.16, 0.229, 0.297, 0.363, 0.43, 0.496, 0.559,
-          0.622, 0.688, 0.75, 0.812, 0.875, 0.938, 1,
-        ],
-        [
-          0, 0.062, 0.125, 0.188, 0.25, 0.312, 0.375, 0.438, 0.5, 0.562, 0.625,
-          0.688, 0.75, 0.812, 0.875, 0.938, 1,
-        ],
-        [
-          0.008, 0.068, 0.135, 0.2, 0.265, 0.329, 0.391, 0.451, 0.509, 0.567,
-          0.627, 0.688, 0.75, 0.812, 0.875, 0.938, 1,
-        ],
-        [
-          0.008, 0.081, 0.159, 0.233, 0.302, 0.37, 0.427, 0.485, 0.534, 0.581,
-          0.632, 0.688, 0.75, 0.812, 0.875, 0.938, 1,
-        ],
-        [
-          0.012, 0.098, 0.188, 0.282, 0.362, 0.436, 0.492, 0.541, 0.574, 0.605,
-          0.64, 0.688, 0.75, 0.812, 0.875, 0.938, 1,
-        ],
-        [
-          0.016, 0.117, 0.227, 0.341, 0.435, 0.52, 0.572, 0.614, 0.629, 0.635,
-          0.65, 0.688, 0.75, 0.812, 0.875, 0.938, 1,
-        ],
-      ];
-      const SHADOW_B = [
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 0],
-        [-0.01, -0.01, -0.01, -0.03, -0.03, -0.01, 0, 0, 0],
-        [-0.01, -0.02, -0.06, -0.11, -0.11, -0.05, -0.02, -0.01, 0],
-        [-0.01, -0.03, -0.14, -0.25, -0.25, -0.11, -0.05, -0.02, 0],
-        [-0.02, -0.06, -0.24, -0.42, -0.43, -0.2, -0.08, -0.03, 0],
-      ];
-      const SHADOW_K = [
-        [0.15, 0.71, 1.36, 1.24, 1.21, 1.15, 1.1, 1.02, 0.95],
-        [0.2, 0.86, 1.31, 1.2, 1.15, 1.1, 1.06, 1.01, 0.97],
-        [1.35, 1.24, 1.2, 1.15, 1.09, 1.06, 1.04, 1.01, 0.97],
-        [1.12, 1.11, 1.06, 1.04, 1.02, 1, 1, 1, 0.97],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1.1, 1.02, 1, 0.97, 0.97, 0.97, 0.97, 0.97, 0.97],
-        [1.3, 1.12, 1.04, 1, 0.97, 0.97, 0.97, 0.97, 1],
-        [1.55, 1.29, 1.15, 1.05, 0.99, 0.97, 0.97, 0.97, 1],
-        [1.82, 1.47, 1.29, 1.19, 1.06, 0.97, 0.97, 0.97, 1],
-      ];
+function applyFormDiff(targetCfg, cur, force) {
+  const prev = lastFormConfig;
+  Object.keys(cur).forEach((key) => {
+    if (key === "adjustments") return;
+    if (force.includes(key) || cur[key] !== prev[key]) targetCfg[key] = cur[key];
+  });
+  const adj = { ...defaultAdjustments, ...(targetCfg.adjustments || {}) };
+  adjustmentKeys.forEach((k) => {
+    if (force.includes("adjustments") || cur.adjustments[k] !== prev.adjustments[k]) adj[k] = cur.adjustments[k];
+  });
+  targetCfg.adjustments = adj;
+}
 
-      function lerpUniform(arr, v) {
-        const pos = Math.min(1, Math.max(0, v)) * (arr.length - 1);
-        const i = Math.min(arr.length - 2, Math.floor(pos));
-        return arr[i] + (arr[i + 1] - arr[i]) * (pos - i);
-      }
+function handleSettingChange(immediate = true, force = []) {
+  const currentConfig = collectCurrentFormConfig();
+  if (selectedImageIds.length === 0) {
+    applyFormDiff(globalSettings, currentConfig, force);
+    uploadedFiles.forEach((item) => applyFormDiff(item.config, currentConfig, force));
+  } else {
+    uploadedFiles.forEach((item) => {
+      if (selectedImageIds.includes(item.id)) applyFormDiff(item.config, currentConfig, force);
+    });
+  }
+  lastFormConfig = currentConfig;
+  if (immediate) renderAllPreviews();
+  else { clearTimeout(renderTimer); renderTimer = setTimeout(renderAllPreviews, 50); }
+}
 
-      function buildShadowLut(shadows) {
-        const s = Math.min(100, Math.max(-100, shadows * 100));
-        let li = 0;
-        while (li < SHADOW_LEVELS.length - 2 && s > SHADOW_LEVELS[li + 1]) li++;
-        const t =
-          (s - SHADOW_LEVELS[li]) / (SHADOW_LEVELS[li + 1] - SHADOW_LEVELS[li]);
-        const mix = (tbl) =>
-          tbl[li].map((v, j) => v + (tbl[li + 1][j] - v) * t);
-        const F = mix(SHADOW_F),
-          B = mix(SHADOW_B),
-          K = mix(SHADOW_K);
-        const n = 1024;
-        const f = new Float32Array(n + 1);
-        const b = new Float32Array(n + 1);
-        const k = new Float32Array(n + 1);
-        for (let i = 0; i <= n; i++) {
-          const y = i / n;
-          f[i] = lerpUniform(F, y);
-          b[i] = lerpUniform(B, y);
-          k[i] = lerpUniform(K, y);
-        }
-        return { f, b, k, local: s > 0 };
-      }
+function syncFormWithConfig(config) {
+  canvasSizeInput.value = config.canvasSize;
+  bgColorInput.value = config.bgColor;
+  outerColorInput.value = config.outerColor;
+  outerSizeInput.value = config.outerSize;
+  outerSizeVal.textContent = config.outerSize + "px";
+  innerColorInput.value = config.innerColor;
+  innerSizeInput.value = config.innerSize;
+  innerSizeVal.textContent = config.innerSize + "px";
+  targetScopeSelect.value = config.targetScope;
+  borderAlignSelect.value = config.borderAlign;
+  updateBorderToggleUI(config.borderEnabled !== false);
+  if (config.adjustments) {
+    adjustmentKeys.forEach((key) => {
+      const val = config.adjustments[key] || 0;
+      const slider = document.getElementById(`adj-${key}`);
+      const valSpan = document.getElementById(`val-${key}`);
+      if (slider) slider.value = val;
+      if (valSpan) valSpan.textContent = val;
+    });
+  }
+  lastFormConfig = collectCurrentFormConfig();
+}
 
-      function sampleLowFreq(low, px, width) {
-        const py = (px / width) | 0;
-        const fx = Math.min(
-          low.gw - 1,
-          Math.max(0, (px - py * width + 0.5) / low.scale - 0.5),
-        );
-        const fy = Math.min(
-          low.gh - 1,
-          Math.max(0, (py + 0.5) / low.scale - 0.5),
-        );
-        const x0 = fx | 0,
-          y0 = fy | 0;
-        const x1 = Math.min(low.gw - 1, x0 + 1),
-          y1 = Math.min(low.gh - 1, y0 + 1);
-        const tx = fx - x0,
-          ty = fy - y0;
-        const g = low.grid,
-          w = low.gw;
-        return (
-          (g[y0 * w + x0] * (1 - tx) + g[y0 * w + x1] * tx) * (1 - ty) +
-          (g[y1 * w + x0] * (1 - tx) + g[y1 * w + x1] * tx) * ty
-        );
-      }
+function updateUIForSelection() {
+  if (selectedImageIds.length === 0) {
+    settingsTitle.textContent = "一括編集設定";
+    targetModeBadge.textContent = "全体に適用";
+    targetModeBadge.className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-blue-100 text-blue-800";
+    deleteActionArea.classList.add("hidden");
+  } else if (selectedImageIds.length === 1) {
+    const target = uploadedFiles.find((item) => item.id === selectedImageIds[0]);
+    settingsTitle.textContent = "個別編集設定";
+    targetModeBadge.textContent = target ? target.name : "個別選択中";
+    targetModeBadge.className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-amber-100 text-amber-800 truncate max-w-[120px]";
+    btnDeleteText.textContent = "この画像を削除";
+    deleteActionArea.classList.remove("hidden");
+  } else {
+    settingsTitle.textContent = "複数選択編集設定";
+    targetModeBadge.textContent = `選択中: ${selectedImageIds.length}件`;
+    targetModeBadge.className = "text-xs font-semibold px-2.5 py-1 rounded-full bg-purple-100 text-purple-800";
+    btnDeleteText.textContent = `選択中の${selectedImageIds.length}件を削除`;
+    deleteActionArea.classList.remove("hidden");
+  }
+}
 
-      const HIGHLIGHT_MAX = {
-        fx: [0.0, 0.318, 0.694, 0.792, 0.878, 0.957, 1.0],
-        fy: [0.0, 0.325, 0.741, 0.835, 0.895, 0.965, 1.0],
-        kx: [0.0, 0.021, 0.812, 0.938, 0.979, 1.0],
-        ky: [1.0, 1.0, 0.57, 0.3, 0.17, 0.17],
-      };
-      const HIGHLIGHT_MIN = {
-        fx: [0.0, 0.255, 0.455, 0.749, 0.82, 0.878, 0.929, 0.973, 0.988, 1.0],
-        fy: [0.0, 0.251, 0.421, 0.624, 0.693, 0.779, 0.883, 0.991, 1.0, 1.0],
-        kx: [0.0, 0.021, 0.188, 0.479, 0.729, 0.812, 0.896, 0.938, 0.979, 1.0],
-        ky: [1.1, 1.1, 0.97, 1.17, 1.62, 1.95, 2.45, 2.77, 2.57, 2.57],
-      };
+function fitPreviewHeight() {
+  previewContainer.style.maxHeight = "";
+  const first = previewContainer.querySelector(".image-card");
+  if (!first) return;
+  const cs = getComputedStyle(previewContainer);
+  const need = first.offsetHeight + parseFloat(cs.paddingTop) + parseFloat(cs.paddingBottom) + 8;
+  if (need > (parseFloat(cs.maxHeight) || 0)) previewContainer.style.maxHeight = need + "px";
+}
+window.addEventListener("resize", () => { if (uploadedFiles.length > 0) fitPreviewHeight(); });
 
-      const BRIL_SIGMA_FRAC = 0.03;
-      const BRIL_KNOT_L = [
-        0.0, 0.1, 0.2, 0.28, 0.33, 0.38, 0.43, 0.475, 0.525, 0.575, 0.625, 0.68,
-        0.73, 0.775, 0.825, 0.87, 0.913, 0.96, 1.0,
-      ];
-      const BRIL_KNOT_F = [
-        0.0, 0.161, 0.301, 0.406, 0.446, 0.488, 0.534, 0.567, 0.61, 0.653,
-        0.658, 0.681, 0.69, 0.69, 0.71, 0.73, 0.777, 0.91, 1.0,
-      ];
-      const BRIL_KNOT_K = [
-        1.4, 1.4, 1.4, 1.37, 1.23, 1.11, 1.03, 0.88, 0.68, 0.58, 0.66, 0.82,
-        0.99, 1.22, 1.52, 2.0, 2.52, 2.3, 1.5,
-      ];
-      const BRIL_KNOT_C = [
-        1.37, 1.39, 1.4, 1.42, 1.34, 1.29, 1.21, 1.12, 1.05, 1.05, 1.05, 1.03,
-        1.06, 1.17, 1.37, 1.69, 2.33, 2.0, 1.0,
-      ];
+function renderAllPreviews() {
+  previewContainer.innerHTML = "";
+  if (uploadedFiles.length === 0) {
+    previewContainer.style.maxHeight = "";
+    previewContainer.appendChild(emptyState);
+    previewContainer.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1 scrollbar-gutter-stable";
+    return;
+  }
+  if (uploadedFiles.length === 1) previewContainer.className = "grid grid-cols-1 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1 scrollbar-gutter-stable";
+  else previewContainer.className = "grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto max-h-[750px] pr-2 p-1 scrollbar-gutter-stable";
 
-      function buildBrillianceLut(p) {
-        const n = 1024;
-        const f = new Float32Array(n + 1);
-        const k = new Float32Array(n + 1);
-        const c = new Float32Array(n + 1);
-        let seg = 0;
-        for (let i = 0; i <= n; i++) {
-          const L = i / n;
-          while (seg < BRIL_KNOT_L.length - 2 && L > BRIL_KNOT_L[seg + 1])
-            seg++;
-          const t =
-            (L - BRIL_KNOT_L[seg]) / (BRIL_KNOT_L[seg + 1] - BRIL_KNOT_L[seg]);
-          const F =
-            BRIL_KNOT_F[seg] + (BRIL_KNOT_F[seg + 1] - BRIL_KNOT_F[seg]) * t;
-          const K =
-            BRIL_KNOT_K[seg] + (BRIL_KNOT_K[seg + 1] - BRIL_KNOT_K[seg]) * t;
-          const C =
-            BRIL_KNOT_C[seg] + (BRIL_KNOT_C[seg + 1] - BRIL_KNOT_C[seg]) * t;
-          f[i] = L + p * (F - L);
-          k[i] = 1 + p * (K - 1);
-          c[i] = 1 + p * (C - 1);
-        }
-        return { f, k, c };
-      }
-      function buildExposureLut(exposure) {
-        const n = 1024;
-        const lut = new Float32Array(n + 1);
-        const ev = exposure * 2.0;
-        const factor = Math.pow(2, ev);
-        for (let i = 0; i <= n; i++) {
-          const linear = SRGB_TO_LIN[i];
-          const adjusted = linear * factor;
-          lut[i] =
-            LIN_TO_SRGB[
-              Math.min(4096, Math.max(0, Math.round(adjusted * 4096)))
-            ];
-        }
-        return lut;
-      }
+  uploadedFiles.forEach((item) => {
+    if (item.config.zoom === undefined) item.config.zoom = 0.0;
+    if (item.config.zoomX === undefined) item.config.zoomX = 0.5;
+    if (item.config.zoomY === undefined) item.config.zoomY = 0.5;
+    if (item.config.rotation === undefined) item.config.rotation = 0.0;
 
-      function buildBrillianceLowFreq(data, width, height) {
-        const m = Math.max(width, height);
-        const scale = Math.max(1, Math.ceil(m / 200));
-        const gw = Math.ceil(width / scale);
-        const gh = Math.ceil(height / scale);
-        const grid = new Float32Array(gw * gh);
-        const cnt = new Float32Array(gw * gh);
-        for (let y = 0; y < height; y++) {
-          const rowBase = ((y / scale) | 0) * gw;
-          for (let x = 0; x < width; x++) {
-            const i = (y * width + x) * 4;
-            const gi = rowBase + ((x / scale) | 0);
-            grid[gi] +=
-              (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) /
-              255;
-            cnt[gi]++;
-          }
-        }
-        for (let i = 0; i < grid.length; i++) grid[i] /= cnt[i];
+    const canvas = generateCanvas(item, false);
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.88);
+    const isSelected = selectedImageIds.includes(item.id);
+    const zoomPercent = Number(item.config.zoom).toFixed(1);
+    const rotDeg = Number(item.config.rotation).toFixed(1);
+    const isZoomed = item.config.zoom >= 1.0;
 
-        const sigma = (BRIL_SIGMA_FRAC * m) / scale;
-        const r = Math.max(
-          1,
-          Math.round(Math.sqrt(sigma * sigma + 0.25) - 0.5),
-        );
-        const tmp = new Float32Array(gw * gh);
-        for (let pass = 0; pass < 3; pass++) {
-          for (let y = 0; y < gh; y++) boxBlurLine(grid, tmp, y * gw, 1, gw, r);
-          for (let x = 0; x < gw; x++) boxBlurLine(tmp, grid, x, gw, gh, r);
-        }
-        return { grid, gw, gh, scale };
-      }
+    const card = document.createElement("div");
+    card.className = `image-card bg-slate-50 border border-slate-200 rounded-2xl p-3 flex flex-col space-y-2 cursor-pointer transition-all ${uploadedFiles.length === 1 ? "max-w-2xl mx-auto w-full" : ""} ${isSelected ? "selected-card bg-amber-50/20" : "hover:border-blue-300"}`;
 
-      function boxBlurLine(src, dst, off, stride, n, r) {
-        const inv = 1 / (2 * r + 1);
-        let sum = 0;
-        for (let k = -r; k <= r; k++)
-          sum += src[off + Math.min(n - 1, Math.max(0, k)) * stride];
-        for (let i = 0; i < n; i++) {
-          dst[off + i * stride] = sum * inv;
-          sum +=
-            src[off + Math.min(n - 1, i + r + 1) * stride] -
-            src[off + Math.max(0, i - r) * stride];
-        }
-      }
+    card.onclick = (e) => {
+      if (e.target.tagName === "A" || e.target.tagName === "INPUT" || e.target.tagName === "BUTTON") return;
+      e.stopPropagation();
+      if (e.ctrlKey || e.metaKey) {
+        if (isSelected) selectedImageIds = selectedImageIds.filter((id) => id !== item.id);
+        else selectedImageIds.push(item.id);
+      } else selectedImageIds = [item.id];
+      updateUIForSelection();
+      if (selectedImageIds.length === 1) syncFormWithConfig(item.config);
+      renderAllPreviews();
+    };
 
-      function drawInsideBorders(
-        ctx,
-        box,
-        outerColor,
-        outerSize,
-        innerColor,
-        innerSize,
-      ) {
-        ctx.save();
-        let { x, y, w, h } = box;
-        if (outerSize > 0) {
-          ctx.fillStyle = outerColor;
-          drawFrame(ctx, x, y, w, h, outerSize);
-        }
-        if (innerSize > 0) {
-          ctx.fillStyle = innerColor;
-          drawFrame(
-            ctx,
-            x + outerSize,
-            y + outerSize,
-            w - outerSize * 2,
-            h - outerSize * 2,
-            innerSize,
-          );
-        }
-        ctx.restore();
-      }
+    const sizeText = `${item.config.canvasSize}×${item.config.canvasSize}px`;
+    const downloadBtnId = "dl_" + item.id;
+    const zoomSliderId = "zoom_slider_" + item.id;
+    const zoomValId = "zoom_val_" + item.id;
+    const zoomResetId = "zoom_reset_" + item.id;
+    const rotSliderId = "rot_slider_" + item.id;
+    const rotValId = "rot_val_" + item.id;
+    const rotResetId = "rot_reset_" + item.id;
+    const imgWrapperId = "img_wrap_" + item.id;
+    const imgElId = "img_el_" + item.id;
 
-      function drawOutsideBorders(
-        ctx,
-        box,
-        outerColor,
-        outerSize,
-        innerColor,
-        innerSize,
-      ) {
-        ctx.save();
-        let { x, y, w, h } = box;
-        if (innerSize > 0) {
-          ctx.fillStyle = innerColor;
-          drawFrame(
-            ctx,
-            x - innerSize,
-            y - innerSize,
-            w + innerSize * 2,
-            h + innerSize * 2,
-            innerSize,
-          );
-        }
-        if (outerSize > 0) {
-          ctx.fillStyle = outerColor;
-          const offsetEnd = innerSize + outerSize;
-          drawFrame(
-            ctx,
-            x - offsetEnd,
-            y - offsetEnd,
-            w + offsetEnd * 2,
-            h + offsetEnd * 2,
-            outerSize,
-          );
-        }
-        ctx.restore();
-      }
+    card.innerHTML = `
+      <div id="${imgWrapperId}" class="aspect-square bg-slate-200 rounded-xl overflow-hidden border border-slate-200 relative flex items-center justify-center select-none ${isZoomed ? "cursor-grab" : ""}">
+        <img id="${imgElId}" src="${dataUrl}" draggable="false" class="max-w-full max-h-full object-contain pointer-events-none">
+        ${isSelected ? '<span class="absolute top-2 left-2 bg-amber-500 text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-full shadow-lg">選択中</span>' : ""}
+        ${isZoomed ? '<span class="absolute top-2 right-2 bg-blue-600/85 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full backdrop-blur-sm">ドラッグ移動可</span>' : ""}
+        <span class="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] px-1.5 py-0.5 rounded backdrop-blur-sm">${sizeText}</span>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-xl p-2.5 space-y-2" onclick="event.stopPropagation()">
+        <div class="space-y-1">
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="font-semibold text-slate-700">ズーム倍率</span>
+            <div class="flex items-center space-x-2"><span id="${zoomValId}" class="font-bold text-blue-600">${zoomPercent}%</span><button id="${zoomResetId}" class="text-[10px] text-slate-500 hover:text-blue-600 underline">戻す</button></div>
+          </div>
+          <input type="range" id="${zoomSliderId}" min="0" max="200" step="0.1" value="${item.config.zoom}" class="w-full accent-blue-600">
+        </div>
+        <div class="space-y-1 pt-1 border-t border-slate-100">
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="font-semibold text-slate-700">傾き補正 (回転)</span>
+            <div class="flex items-center space-x-2"><span id="${rotValId}" class="font-bold text-blue-600">${rotDeg}°</span><button id="${rotResetId}" class="text-[10px] text-slate-500 hover:text-blue-600 underline">戻す</button></div>
+          </div>
+          <input type="range" id="${rotSliderId}" min="-45" max="45" step="0.1" value="${item.config.rotation}" class="w-full accent-blue-600">
+        </div>
+      </div>
+      <div class="flex justify-between items-center text-xs text-slate-600 pt-1">
+        <span class="truncate max-w-[130px] font-medium" title="${item.name}">${item.name}</span>
+        <button id="${downloadBtnId}" class="bg-blue-600 hover:bg-blue-700 text-white font-medium px-3 py-1 rounded-lg transition-all shadow-sm">保存</button>
+      </div>`;
+    previewContainer.appendChild(card);
 
-      function drawFrame(ctx, x, y, w, h, size) {
-        if (w <= 0 || h <= 0 || size <= 0) return;
-        ctx.beginPath();
-        ctx.rect(x, y, w, h);
-        ctx.rect(x + size, y + size, w - size * 2, h - size * 2);
-        ctx.fill("evenodd");
-      }
+    const zoomSliderEl = document.getElementById(zoomSliderId);
+    const zoomValEl = document.getElementById(zoomValId);
+    const zoomResetEl = document.getElementById(zoomResetId);
+    const rotSliderEl = document.getElementById(rotSliderId);
+    const rotValEl = document.getElementById(rotValId);
+    const rotResetEl = document.getElementById(rotResetId);
+    const imgWrapperEl = document.getElementById(imgWrapperId);
+    const imgEl = document.getElementById(imgElId);
+    const dlBtn = document.getElementById(downloadBtnId);
 
-      btnDownloadAll.addEventListener("click", () => {
-        const links = previewContainer.querySelectorAll("button[id^='dl_']");
-        links.forEach((btn, idx) => {
-          setTimeout(() => {
-            btn.click();
-          }, idx * 250);
-        });
+    if (zoomSliderEl) {
+      zoomSliderEl.addEventListener("input", (ev) => {
+        ev.stopPropagation();
+        const val = parseFloat(zoomSliderEl.value) || 0;
+        item.config.zoom = val;
+        if (zoomValEl) zoomValEl.textContent = val.toFixed(1) + "%";
+        const updatedCanvas = generateCanvas(item, false);
+        if (imgEl) imgEl.src = updatedCanvas.toDataURL("image/jpeg", 0.85);
       });
-    </script>
-  </body>
+      zoomSliderEl.addEventListener("change", (ev) => { ev.stopPropagation(); renderAllPreviews(); });
+    }
+    if (zoomResetEl) zoomResetEl.addEventListener("click", (ev) => {
+      ev.stopPropagation(); item.config.zoom = 0.0; item.config.zoomX = 0.5; item.config.zoomY = 0.5; renderAllPreviews();
+    });
+    if (rotSliderEl) {
+      rotSliderEl.addEventListener("input", (ev) => {
+        ev.stopPropagation();
+        const val = parseFloat(rotSliderEl.value) || 0;
+        item.config.rotation = val;
+        if (rotValEl) rotValEl.textContent = val.toFixed(1) + "°";
+        const updatedCanvas = generateCanvas(item, false);
+        if (imgEl) imgEl.src = updatedCanvas.toDataURL("image/jpeg", 0.85);
+      });
+      rotSliderEl.addEventListener("change", (ev) => { ev.stopPropagation(); renderAllPreviews(); });
+    }
+    if (rotResetEl) rotResetEl.addEventListener("click", (ev) => { ev.stopPropagation(); item.config.rotation = 0.0; renderAllPreviews(); });
+
+    if (imgWrapperEl) {
+      let isDragging = false, hasDragged = false, startX = 0, startY = 0;
+      imgWrapperEl.addEventListener("mousedown", (ev) => {
+        if (item.config.zoom < 1.0) return;
+        ev.stopPropagation(); ev.preventDefault();
+        isDragging = true; hasDragged = false; startX = ev.clientX; startY = ev.clientY;
+        imgWrapperEl.classList.add("cursor-grabbing");
+      });
+      const onMouseMove = (ev) => {
+        if (!isDragging) return;
+        const dx = ev.clientX - startX, dy = ev.clientY - startY;
+        if (Math.abs(dx) > 2 || Math.abs(dy) > 2) hasDragged = true;
+        startX = ev.clientX; startY = ev.clientY;
+        const rect = imgWrapperEl.getBoundingClientRect();
+        const scaleFactor = 1 + item.config.zoom / 100;
+        const moveFactorX = 1 / (rect.width * (scaleFactor - 1));
+        const moveFactorY = 1 / (rect.height * (scaleFactor - 1));
+        item.config.zoomX = Math.max(0, Math.min(1, item.config.zoomX - dx * moveFactorX));
+        item.config.zoomY = Math.max(0, Math.min(1, item.config.zoomY - dy * moveFactorY));
+        const updatedCanvas = generateCanvas(item, false);
+        if (imgEl) imgEl.src = updatedCanvas.toDataURL("image/jpeg", 0.85);
+      };
+      const onMouseUp = () => {
+        if (!isDragging) return;
+        isDragging = false; imgWrapperEl.classList.remove("cursor-grabbing");
+        if (hasDragged) renderAllPreviews();
+      };
+      window.addEventListener("mousemove", onMouseMove);
+      window.addEventListener("mouseup", onMouseUp);
+    }
+
+    if (dlBtn) {
+      dlBtn.onclick = (ev) => {
+        ev.stopPropagation();
+        openSaveModal(item);
+      };
+    }
+  });
+  fitPreviewHeight();
+}
+
+// ==========================================
+// 保存処理（単品はJPEG・2枚以上はZIP自動切替）
+// ==========================================
+
+function showToast(message, type = "info") {
+  if (!toastContainer) return;
+  const el = document.createElement("div");
+  const bg = type === "error" ? "bg-red-600" : type === "success" ? "bg-emerald-600" : "bg-slate-800";
+  el.className = `${bg} text-white text-xs font-medium px-4 py-3 rounded-xl shadow-lg max-w-xs pointer-events-auto transition-all`;
+  el.textContent = message;
+  toastContainer.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = "0";
+    setTimeout(() => el.remove(), 200);
+  }, 4500);
+}
+
+function getOutputFilename(item, usedNames = null) {
+  const base = `${item.config.canvasSize}_${item.name.replace(/\.[^/.]+$/, "")}`;
+  let candidate = `${base}.jpg`;
+  if (usedNames) {
+    let counter = 2;
+    while (usedNames.has(candidate)) {
+      candidate = `${base}_${counter}.jpg`;
+      counter++;
+    }
+    usedNames.add(candidate);
+  }
+  return candidate;
+}
+
+function getSaveTargetItems(target) {
+  if (target) return [target];
+  if (selectedImageIds.length > 0) {
+    const selected = uploadedFiles.filter((item) => selectedImageIds.includes(item.id));
+    if (selected.length > 0) return selected;
+  }
+  return uploadedFiles;
+}
+
+function isSingleSave(target) {
+  return getSaveTargetItems(target).length <= 1;
+}
+
+function updateSaveModalUI() {
+  const single = isSingleSave(saveModalTarget);
+  const mobile = isMobile();
+
+  if (mobile) {
+    saveOptionsPc.classList.add("hidden");
+    saveOptionsMobile.classList.remove("hidden");
+    savePhotoMobile.classList.remove("hidden");
+    saveFileMobile.textContent = single ? "ファイルにダウンロード" : "ZIPファイルをダウンロード";
+    return;
+  }
+
+  saveOptionsPc.classList.remove("hidden");
+  saveOptionsMobile.classList.add("hidden");
+
+  if (single) {
+    saveDownloadPc.textContent = "既定のフォルダにダウンロード";
+    savePickerPc.textContent = "保存先を選んで保存（名前を付けて保存）";
+  } else {
+    saveDownloadPc.textContent = "既定のフォルダにZIPダウンロード";
+    savePickerPc.textContent = "保存先を選んでZIP保存（名前を付けて保存）";
+  }
+
+  const canSaveFile = typeof window.showSaveFilePicker === "function";
+  savePickerPc.disabled = !canSaveFile;
+  savePickerPc.classList.toggle("opacity-50", !canSaveFile);
+  savePickerPc.classList.toggle("cursor-not-allowed", !canSaveFile);
+  savePickerPc.title = canSaveFile ? "" : "お使いのブラウザは名前を付けて保存に対応していません";
+}
+
+function openSaveModal(itemOrNull) {
+  const items = getSaveTargetItems(itemOrNull);
+  if (items.length === 0) return;
+  saveModalTarget = itemOrNull;
+  if (items.length === 1) {
+    saveModalDesc.textContent = `「${items[0].name}」をJPEG画像として保存します。`;
+  } else {
+    const scopeLabel = !itemOrNull && selectedImageIds.length > 0 ? "選択中の" : "全";
+    saveModalDesc.textContent = `${scopeLabel}${items.length}件を1つのZIPファイルにまとめて保存します。`;
+  }
+  updateSaveModalUI();
+  saveModal.classList.remove("hidden");
+}
+
+function closeSaveModal() {
+  saveModal.classList.add("hidden");
+  saveModalTarget = null;
+}
+
+saveModalClose.addEventListener("click", closeSaveModal);
+saveModal.addEventListener("click", (e) => {
+  if (e.target === saveModal) closeSaveModal();
+});
+
+// PC: 既定のフォルダにダウンロード（単品はJPEG・複数はZIP）
+saveDownloadPc.addEventListener("click", async () => {
+  const target = saveModalTarget;
+  const items = getSaveTargetItems(target);
+  const single = isSingleSave(target);
+  closeSaveModal();
+  if (single) {
+    await downloadSingleItem(items[0]);
+  } else {
+    await downloadItemsAsZip(items, "processed_images.zip");
+  }
+});
+
+// PC: 保存先を選んで保存（単品はJPEG・複数はZIP）
+savePickerPc.addEventListener("click", async () => {
+  const target = saveModalTarget;
+  const items = getSaveTargetItems(target);
+  const single = isSingleSave(target);
+  closeSaveModal();
+  if (single) {
+    await saveSingleWithFilePicker(items[0]);
+  } else {
+    await saveZipWithFilePicker(items, "processed_images.zip");
+  }
+});
+
+// Mobile: 写真アプリに保存（共有シート経由）
+savePhotoMobile.addEventListener("click", async () => {
+  const target = saveModalTarget;
+  const items = getSaveTargetItems(target);
+  closeSaveModal();
+  for (const item of items) {
+    await shareOrDownload(item);
+  }
+});
+
+// Mobile: ファイルにダウンロード（単品はJPEG・複数はZIP）
+saveFileMobile.addEventListener("click", async () => {
+  const target = saveModalTarget;
+  const items = getSaveTargetItems(target);
+  const single = isSingleSave(target);
+  closeSaveModal();
+  if (single) {
+    await downloadSingleItem(items[0]);
+  } else {
+    await downloadItemsAsZip(items, "processed_images.zip");
+  }
+});
+
+function triggerBlobDownload(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 10000);
+}
+
+async function downloadSingleItem(item) {
+  if (!item) return;
+  try {
+    const fullCanvas = generateCanvas(item, true);
+    const blob = await new Promise((resolve) => fullCanvas.toBlob(resolve, "image/jpeg", 0.92));
+    if (!blob) throw new Error("画像の生成に失敗しました");
+    const filename = getOutputFilename(item);
+    triggerBlobDownload(blob, filename);
+    showToast(`「${filename}」をダウンロードしました`, "success");
+  } catch (err) {
+    console.error("保存に失敗しました", err);
+    showToast("保存に失敗しました: " + err.message, "error");
+  }
+}
+
+async function saveSingleWithFilePicker(item) {
+  if (!item) return;
+  try {
+    const fullCanvas = generateCanvas(item, true);
+    const blob = await new Promise((resolve) => fullCanvas.toBlob(resolve, "image/jpeg", 0.92));
+    if (!blob) throw new Error("画像の生成に失敗しました");
+    const filename = getOutputFilename(item);
+    const handle = await window.showSaveFilePicker({
+      suggestedName: filename,
+      types: [{ description: "JPEG画像", accept: { "image/jpeg": [".jpg", ".jpeg"] } }]
+    });
+    const writable = await handle.createWritable();
+    await writable.write(blob);
+    await writable.close();
+    showToast(`「${filename}」を保存しました`, "success");
+  } catch (err) {
+    if (err.name !== "AbortError") {
+      console.error("保存に失敗しました", err);
+      showToast("保存に失敗しました。既定のフォルダへのダウンロードをお試しください。", "error");
+    }
+  }
+}
+
+// 純JS製 無圧縮(Store) ZIP 生成（外部ライブラリ不要で file:/// でも確実に動作）
+const CRC32_TABLE = (() => {
+  const table = new Uint32Array(256);
+  for (let n = 0; n < 256; n++) {
+    let c = n;
+    for (let k = 0; k < 8; k++) {
+      c = (c & 1) ? (0xedb88320 ^ (c >>> 1)) : (c >>> 1);
+    }
+    table[n] = c >>> 0;
+  }
+  return table;
+})();
+
+function crc32(bytes) {
+  let c = 0xffffffff;
+  for (let i = 0; i < bytes.length; i++) {
+    c = CRC32_TABLE[(c ^ bytes[i]) & 0xff] ^ (c >>> 8);
+  }
+  return (c ^ 0xffffffff) >>> 0;
+}
+
+function createZipBlob(entries) {
+  const encoder = new TextEncoder();
+  const localParts = [];
+  const centralParts = [];
+  let offset = 0;
+  const now = new Date();
+  const dosTime = ((now.getHours() & 0x1f) << 11) | ((now.getMinutes() & 0x3f) << 5) | ((now.getSeconds() >> 1) & 0x1f);
+  const dosDate = (((Math.max(1980, now.getFullYear()) - 1980) & 0x7f) << 9) | (((now.getMonth() + 1) & 0x0f) << 5) | (now.getDate() & 0x1f);
+
+  for (const entry of entries) {
+    const nameBytes = encoder.encode(entry.name);
+    const data = entry.data;
+    const crc = crc32(data);
+
+    const localHeader = new ArrayBuffer(30);
+    const lv = new DataView(localHeader);
+    lv.setUint32(0, 0x04034b50, true);
+    lv.setUint16(4, 20, true);
+    lv.setUint16(6, 0x0800, true);
+    lv.setUint16(8, 0, true);
+    lv.setUint16(10, dosTime, true);
+    lv.setUint16(12, dosDate, true);
+    lv.setUint32(14, crc, true);
+    lv.setUint32(18, data.length, true);
+    lv.setUint32(22, data.length, true);
+    lv.setUint16(26, nameBytes.length, true);
+    lv.setUint16(28, 0, true);
+
+    localParts.push(localHeader, nameBytes, data);
+
+    const centralHeader = new ArrayBuffer(46);
+    const cv = new DataView(centralHeader);
+    cv.setUint32(0, 0x02014b50, true);
+    cv.setUint16(4, 20, true);
+    cv.setUint16(6, 20, true);
+    cv.setUint16(8, 0x0800, true);
+    cv.setUint16(10, 0, true);
+    cv.setUint16(12, dosTime, true);
+    cv.setUint16(14, dosDate, true);
+    cv.setUint32(16, crc, true);
+    cv.setUint32(20, data.length, true);
+    cv.setUint32(24, data.length, true);
+    cv.setUint16(28, nameBytes.length, true);
+    cv.setUint16(30, 0, true);
+    cv.setUint16(32, 0, true);
+    cv.setUint16(34, 0, true);
+    cv.setUint16(36, 0, true);
+    cv.setUint32(38, 0, true);
+    cv.setUint32(42, offset, true);
+
+    centralParts.push(centralHeader, nameBytes);
+    offset += 30 + nameBytes.length + data.length;
+  }
+
+  let centralSize = 0;
+  for (const part of centralParts) {
+    centralSize += part.byteLength;
+  }
+
+  const endRecord = new ArrayBuffer(22);
+  const ev = new DataView(endRecord);
+  ev.setUint32(0, 0x06054b50, true);
+  ev.setUint16(4, 0, true);
+  ev.setUint16(6, 0, true);
+  ev.setUint16(8, entries.length, true);
+  ev.setUint16(10, entries.length, true);
+  ev.setUint32(12, centralSize, true);
+  ev.setUint32(16, offset, true);
+  ev.setUint16(20, 0, true);
+
+  return new Blob([...localParts, ...centralParts, endRecord], { type: "application/zip" });
+}
+
+async function buildZipBlobFromItems(items) {
+  const entries = [];
+  const usedNames = new Set();
+  for (const item of items) {
+    const fullCanvas = generateCanvas(item, true);
+    const blob = await new Promise((resolve) => fullCanvas.toBlob(resolve, "image/jpeg", 0.92));
+    const buf = await blob.arrayBuffer();
+    entries.push({
+      name: getOutputFilename(item, usedNames),
+      data: new Uint8Array(buf)
+    });
+  }
+  return createZipBlob(entries);
+}
+
+async function downloadItemsAsZip(items, zipFilename) {
+  try {
+    const zipBlob = await buildZipBlobFromItems(items);
+    triggerBlobDownload(zipBlob, zipFilename);
+    showToast(`ZIPファイル（${items.length}件）をダウンロードしました`, "success");
+  } catch (err) {
+    console.error("ZIP保存に失敗しました", err);
+    showToast("ZIP保存に失敗しました: " + err.message, "error");
+  }
+}
+
+async function saveZipWithFilePicker(items, zipFilename) {
+  try {
+    const zipBlob = await buildZipBlobFromItems(items);
+    const handle = await window.showSaveFilePicker({
+      suggestedName: zipFilename,
+      types: [{ description: "ZIPアーカイブ", accept: { "application/zip": [".zip"] } }]
+    });
+    const writable = await handle.createWritable();
+    await writable.write(zipBlob);
+    await writable.close();
+    showToast(`「${zipFilename}」を保存しました`, "success");
+  } catch (err) {
+    if (err.name !== "AbortError") {
+      console.error("ZIP保存に失敗しました", err);
+      showToast("ZIP保存に失敗しました。既定のフォルダへのダウンロードをお試しください。", "error");
+    }
+  }
+}
+
+// 共有 or ダウンロード（モバイルの写真アプリ保存に近い挙動）
+async function shareOrDownload(item) {
+  const fullCanvas = generateCanvas(item, true);
+  const blob = await new Promise((resolve) => fullCanvas.toBlob(resolve, "image/jpeg", 0.92));
+  const filename = getOutputFilename(item);
+  const file = new File([blob], filename, { type: "image/jpeg" });
+  if (navigator.canShare && navigator.canShare({ files: [file] })) {
+    try {
+      await navigator.share({ files: [file], title: item.name });
+      return;
+    } catch (err) {
+      if (err.name !== "AbortError") console.error("共有失敗", err);
+    }
+  }
+  triggerBlobDownload(blob, filename);
+}
+
+// 一括ダウンロードボタン
+btnDownloadAll.addEventListener("click", () => {
+  openSaveModal(null);
+});
+
+// ==========================================
+// Canvas生成（フON/OFF対応）
+// ==========================================
+
+function generateCanvas(item, isFullResolution = false) {
+  const cfg = item.config;
+  const targetCanvasSize = cfg.canvasSize || 1200;
+  const renderSize = isFullResolution ? targetCanvasSize : Math.min(800, targetCanvasSize);
+
+  const sourceCanvas = document.createElement("canvas");
+  let srcW = item.img.width, srcH = item.img.height;
+  if (!isFullResolution) {
+    const maxDim = Math.max(srcW, srcH);
+    if (maxDim > 800) { const scale = 800 / maxDim; srcW = Math.round(srcW * scale); srcH = Math.round(srcH * scale); }
+  }
+  sourceCanvas.width = srcW; sourceCanvas.height = srcH;
+  const sCtx = sourceCanvas.getContext("2d", { willReadFrequently: true });
+
+  const zoomRate = cfg.zoom || 0;
+  if (zoomRate > 0) {
+    const scaleFactor = 1 + zoomRate / 100;
+    const origW = item.img.width, origH = item.img.height;
+    const cropW = origW / scaleFactor, cropH = origH / scaleFactor;
+    const zx = cfg.zoomX !== undefined ? cfg.zoomX : 0.5;
+    const zy = cfg.zoomY !== undefined ? cfg.zoomY : 0.5;
+    const cropX = (origW - cropW) * zx, cropY = (origH - cropH) * zy;
+    sCtx.drawImage(item.img, cropX, cropY, cropW, cropH, 0, 0, srcW, srcH);
+  } else sCtx.drawImage(item.img, 0, 0, srcW, srcH);
+
+  if (hasAnyAdjustment(cfg.adjustments)) applyColorAdjustments(sCtx, srcW, srcH, cfg.adjustments, isFullResolution);
+
+  const canvas = document.createElement("canvas");
+  canvas.width = renderSize; canvas.height = renderSize;
+  const ctx = canvas.getContext("2d");
+  ctx.fillStyle = cfg.bgColor; ctx.fillRect(0, 0, renderSize, renderSize);
+
+  const totalBorderSize = cfg.borderEnabled ? Math.round((cfg.outerSize + cfg.innerSize) * (renderSize / targetCanvasSize)) : 0;
+  const outerSz = cfg.borderEnabled ? Math.round(cfg.outerSize * (renderSize / targetCanvasSize)) : 0;
+  const innerSz = cfg.borderEnabled ? Math.round(cfg.innerSize * (renderSize / targetCanvasSize)) : 0;
+
+  let baseBox = { x: 0, y: 0, w: renderSize, h: renderSize };
+  let drawW = 0, drawH = 0, drawX = 0, drawY = 0;
+
+  if (cfg.targetScope === "image" && cfg.borderAlign === "outside") {
+    const maxAllowedSize = Math.max(10, renderSize - totalBorderSize * 2);
+    const scale = maxAllowedSize / Math.max(srcW, srcH);
+    drawW = srcW * scale; drawH = srcH * scale;
+    drawX = (renderSize - drawW) / 2; drawY = (renderSize - drawH) / 2;
+    baseBox = { x: drawX, y: drawY, w: drawW, h: drawH };
+  } else if (cfg.targetScope === "image" && cfg.borderAlign === "inside") {
+    const scale = renderSize / Math.max(srcW, srcH);
+    drawW = srcW * scale; drawH = srcH * scale;
+    drawX = (renderSize - drawW) / 2; drawY = (renderSize - drawH) / 2;
+    baseBox = { x: drawX, y: drawY, w: drawW, h: drawH };
+  } else if (cfg.targetScope === "canvas" && cfg.borderAlign === "outside") {
+    const innerCanvasSize = Math.max(10, renderSize - totalBorderSize * 2);
+    const scale = innerCanvasSize / Math.max(srcW, srcH);
+    drawW = srcW * scale; drawH = srcH * scale;
+    const offsetX = (renderSize - innerCanvasSize) / 2, offsetY = (renderSize - innerCanvasSize) / 2;
+    drawX = offsetX + (innerCanvasSize - drawW) / 2; drawY = offsetY + (innerCanvasSize - drawH) / 2;
+    baseBox = { x: offsetX, y: offsetY, w: innerCanvasSize, h: innerCanvasSize };
+  } else if (cfg.targetScope === "canvas" && cfg.borderAlign === "inside") {
+    const scale = renderSize / Math.max(srcW, srcH);
+    drawW = srcW * scale; drawH = srcH * scale;
+    drawX = (renderSize - drawW) / 2; drawY = (renderSize - drawH) / 2;
+    baseBox = { x: 0, y: 0, w: renderSize, h: renderSize };
+  }
+
+  ctx.save();
+  ctx.beginPath(); ctx.rect(drawX, drawY, drawW, drawH); ctx.clip();
+  ctx.translate(drawX + drawW / 2, drawY + drawH / 2);
+  const rotDeg = cfg.rotation || 0;
+  let rotZoom = 1;
+  if (rotDeg !== 0) {
+    const rad = (Math.abs(rotDeg) * Math.PI) / 180;
+    const cosA = Math.cos(rad), sinA = Math.sin(rad);
+    rotZoom = Math.max(cosA + (drawH / drawW) * sinA, cosA + (drawW / drawH) * sinA);
+    ctx.rotate((rotDeg * Math.PI) / 180); ctx.scale(rotZoom, rotZoom);
+  }
+  ctx.drawImage(sourceCanvas, 0, 0, srcW, srcH, -drawW / 2, -drawH / 2, drawW, drawH);
+  ctx.restore();
+
+  if (cfg.borderEnabled) {
+    if (cfg.targetScope === "image" && cfg.borderAlign === "outside") drawOutsideBorders(ctx, baseBox, cfg.outerColor, outerSz, cfg.innerColor, innerSz);
+    else if (cfg.targetScope === "image" && cfg.borderAlign === "inside") drawInsideBorders(ctx, baseBox, cfg.outerColor, outerSz, cfg.innerColor, innerSz);
+    else if (cfg.targetScope === "canvas" && cfg.borderAlign === "outside") drawOutsideBorders(ctx, baseBox, cfg.outerColor, outerSz, cfg.innerColor, innerSz);
+    else if (cfg.targetScope === "canvas" && cfg.borderAlign === "inside") drawInsideBorders(ctx, baseBox, cfg.outerColor, outerSz, cfg.innerColor, innerSz);
+  }
+
+  return canvas;
+}
+
+function hasAnyAdjustment(adj) {
+  if (!adj) return false;
+  return Object.values(adj).some((val) => val !== 0);
+}
+
+// ==========================================
+// 色調補正エンジン（[10]暖かみ・[11]色合い含む完全版）
+// ==========================================
+function applyColorAdjustments(ctx, width, height, adj, isFullResolution) {
+  const imgData = ctx.getImageData(0, 0, width, height);
+  const data = imgData.data;
+  const len = data.length;
+
+  const exposure = (adj.exposure || 0) / 100;
+  const brilliance = (adj.brilliance || 0) / 100;
+  const highlights = (adj.highlights || 0) / 100;
+  const shadows = (adj.shadows || 0) / 100;
+  const contrastVal = (adj.contrast || 0) / 100;
+  const contrastScale = contrastVal >= 0 ? 1.0 + contrastVal * 1.5 : 1.0 + contrastVal * 0.7;
+  const brightness = (adj.brightness || 0) / 100;
+  const blackPoint = (adj.blackPoint || 0) / 100;
+  const saturation = (adj.saturation || 0) / 100;
+  const vibrance = (adj.vibrance || 0) / 100;
+  const warmth = (adj.warmth || 0) / 100;
+  const tint = (adj.tint || 0) / 100;
+
+  let brilLow = null, brilLut = null;
+  const exposureLut = exposure !== 0 ? buildExposureLut(exposure) : null;
+  const brilExp = exposure !== 0 ? Math.pow(2, exposure * 2.0) : 1.0;
+  if (brilliance > 0 || shadows > 0) brilLow = buildBrillianceLowFreq(data, width, height);
+  if (brilliance > 0) brilLut = buildBrillianceLut(Math.min(1, brilliance));
+  const shadowLut = shadows !== 0 ? buildShadowLut(shadows) : null;
+  const highlightLut = highlights !== 0 ? buildToneLut(highlights > 0 ? HIGHLIGHT_MAX : HIGHLIGHT_MIN, Math.min(1, Math.abs(highlights))) : null;
+  const brightLut = brightness !== 0 ? buildBrightnessLut(brightness) : null;
+  const blackPointLut = blackPoint !== 0 ? buildBlackPointLut(blackPoint) : null;
+  const saturationLut = saturation > 0 ? buildSaturationLut(saturation) : null;
+  const warmthLut = warmth !== 0 ? buildWarmthLut(warmth) : null;
+  const tintLut = tint !== 0 ? buildTintLut(tint) : null;
+
+  for (let i = 0; i < len; i += 4) {
+    let r = data[i] / 255, g = data[i + 1] / 255, b = data[i + 2] / 255;
+    let luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+
+    if (exposureLut) {
+      r = exposureLut[Math.min(1024, Math.max(0, Math.round(r * 1024)))];
+      g = exposureLut[Math.min(1024, Math.max(0, Math.round(g * 1024)))];
+      b = exposureLut[Math.min(1024, Math.max(0, Math.round(b * 1024)))];
+      luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+    }
+
+    if (brilliance !== 0) {
+      if (brilliance < 0) {
+        const bDown = Math.abs(brilliance);
+        r = r + bDown * 1.5 * (r - 0.5) * Math.abs(r - 0.5);
+        g = g + bDown * 1.5 * (g - 0.5) * Math.abs(g - 0.5);
+        b = b + bDown * 1.5 * (b - 0.5) * Math.abs(b - 0.5);
+      } else {
+        const rc = Math.min(1, Math.max(0, r)), gc = Math.min(1, Math.max(0, g)), bc = Math.min(1, Math.max(0, b));
+        const yIn = 0.299 * rc + 0.587 * gc + 0.114 * bc;
+        const px = i >> 2, py = (px / width) | 0;
+        const fx = Math.min(brilLow.gw - 1, Math.max(0, (px - py * width + 0.5) / brilLow.scale - 0.5));
+        const fy = Math.min(brilLow.gh - 1, Math.max(0, (py + 0.5) / brilLow.scale - 0.5));
+        const x0 = fx | 0, y0 = fy | 0;
+        const x1 = Math.min(brilLow.gw - 1, x0 + 1), y1 = Math.min(brilLow.gh - 1, y0 + 1);
+        const tx = fx - x0, ty = fy - y0;
+        const gr = brilLow.grid, gw2 = brilLow.gw;
+        const lowRaw = (gr[y0 * gw2 + x0] * (1 - tx) + gr[y0 * gw2 + x1] * tx) * (1 - ty) + (gr[y1 * gw2 + x0] * (1 - tx) + gr[y1 * gw2 + x1] * tx) * ty;
+        const low = Math.min(1, Math.max(0, lowRaw * brilExp));
+        const li = Math.round(low * 1024);
+        const yOut = brilLut.f[li] + brilLut.k[li] * (yIn - low);
+        const cs = brilLut.c[li];
+        r = Math.min(1, Math.max(0, yOut + cs * (rc - yIn)));
+        g = Math.min(1, Math.max(0, yOut + cs * (gc - yIn)));
+        b = Math.min(1, Math.max(0, yOut + cs * (bc - yIn)));
+      }
+    }
+
+    if (highlights !== 0) {
+      const rc = Math.min(1, Math.max(0, r)), gc = Math.min(1, Math.max(0, g)), bc = Math.min(1, Math.max(0, b));
+      const yIn = 0.299 * rc + 0.587 * gc + 0.114 * bc;
+      const hi = Math.round(yIn * 1024);
+      const yOut = highlightLut.f[hi], kc = highlightLut.k[hi];
+      r = Math.min(1, Math.max(0, yOut + kc * (rc - yIn)));
+      g = Math.min(1, Math.max(0, yOut + kc * (gc - yIn)));
+      b = Math.min(1, Math.max(0, yOut + kc * (bc - yIn)));
+    }
+
+    if (shadows !== 0) {
+      const rc = Math.min(1, Math.max(0, r)), gc = Math.min(1, Math.max(0, g)), bc = Math.min(1, Math.max(0, b));
+      const yIn = 0.299 * rc + 0.587 * gc + 0.114 * bc;
+      const si = Math.round(yIn * 1024);
+      let yOut = shadowLut.f[si];
+      if (shadowLut.local) {
+        const yRaw = (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) / 255;
+        const lowRaw = sampleLowFreq(brilLow, i >> 2, width);
+        yOut += shadowLut.b[si] * (lowRaw - yRaw) * brilExp;
+      }
+      const kc = shadowLut.k[si];
+      r = Math.min(1, Math.max(0, yOut + kc * (rc - yIn)));
+      g = Math.min(1, Math.max(0, yOut + kc * (gc - yIn)));
+      b = Math.min(1, Math.max(0, yOut + kc * (bc - yIn)));
+    }
+
+    if (contrastVal !== 0) { r = (r - 0.5) * contrastScale + 0.5; g = (g - 0.5) * contrastScale + 0.5; b = (b - 0.5) * contrastScale + 0.5; }
+
+    if (brightness !== 0) {
+      const rc = Math.min(1, Math.max(0, r)), gc = Math.min(1, Math.max(0, g)), bc = Math.min(1, Math.max(0, b));
+      const yIn = 0.299 * rc + 0.587 * gc + 0.114 * bc;
+      const bi = Math.round(yIn * 1024);
+      const yOut = brightLut.f[bi], kc = brightLut.k[bi];
+      r = Math.min(1, Math.max(0, yOut + kc * (rc - yIn)));
+      g = Math.min(1, Math.max(0, yOut + kc * (gc - yIn)));
+      b = Math.min(1, Math.max(0, yOut + kc * (bc - yIn)));
+    }
+
+    if (blackPoint !== 0) {
+      r = blackPointLut[Math.round(Math.min(1, Math.max(0, r)) * 1024)];
+      g = blackPointLut[Math.round(Math.min(1, Math.max(0, g)) * 1024)];
+      b = blackPointLut[Math.round(Math.min(1, Math.max(0, b)) * 1024)];
+    }
+
+    if (saturation !== 0) {
+      const rc = Math.min(1, Math.max(0, r)), gc = Math.min(1, Math.max(0, g)), bc = Math.min(1, Math.max(0, b));
+      const rl = SRGB_TO_LIN[Math.round(rc * 1024)], gl = SRGB_TO_LIN[Math.round(gc * 1024)], bl = SRGB_TO_LIN[Math.round(bc * 1024)];
+      const ml = (rl + gl + bl) / 3;
+      let k = 1 + saturation;
+      if (saturation > 0) {
+        k = saturationLut.a[Math.round(LIN_TO_SRGB[Math.round(ml * 4096)] * 1024)];
+        const mx = Math.max(rc, gc, bc), d = mx - Math.min(rc, gc, bc);
+        if (d > 1e-6) {
+          let pos; if (mx === rc) pos = ((((gc - bc) / d) % 6) + 6) % 6; else if (mx === gc) pos = (bc - rc) / d + 2; else pos = (rc - gc) / d + 4;
+          const i0 = Math.floor(pos) % 6, tt = pos - Math.floor(pos);
+          const hh = saturationLut.h[i0] * (1 - tt) + saturationLut.h[(i0 + 1) % 6] * tt;
+          k *= 1 + (hh - 1) * Math.min(1, d / mx / 0.08);
+        }
+      }
+      r = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, ml + k * (rl - ml))) * 4096)];
+      g = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, ml + k * (gl - ml))) * 4096)];
+      b = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, ml + k * (bl - ml))) * 4096)];
+    }
+
+    if (vibrance !== 0) {
+      const rc = Math.min(1, Math.max(0, r)), gc = Math.min(1, Math.max(0, g)), bc = Math.min(1, Math.max(0, b));
+      const rl = SRGB_TO_LIN[Math.round(rc * 1024)], gl = SRGB_TO_LIN[Math.round(gc * 1024)], bl = SRGB_TO_LIN[Math.round(bc * 1024)];
+      const lum = 0.299 * rl + 0.587 * gl + 0.114 * bl;
+      const max = Math.max(rl, gl, bl), min = Math.min(rl, gl, bl);
+      const sat = max === 0 ? 0 : (max - min) / max;
+      let factor; if (vibrance > 0) factor = 1 + vibrance * Math.pow(1 - sat, 0.7) * 1.3; else factor = 1 + vibrance * 0.9;
+      const rl2 = lum + (rl - lum) * factor, gl2 = lum + (gl - lum) * factor, bl2 = lum + (bl - lum) * factor;
+      r = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, rl2)) * 4096)];
+      g = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, gl2)) * 4096)];
+      b = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, bl2)) * 4096)];
+    }
+
+    if (warmth !== 0) {
+      const rl = SRGB_TO_LIN[Math.round(Math.min(1, Math.max(0, r)) * 1024)];
+      const gl = SRGB_TO_LIN[Math.round(Math.min(1, Math.max(0, g)) * 1024)];
+      const bl = SRGB_TO_LIN[Math.round(Math.min(1, Math.max(0, b)) * 1024)];
+      const fx = labF((0.4124564 * rl + 0.3575761 * gl + 0.1804375 * bl) / 0.95047);
+      const fy = labF(0.2126729 * rl + 0.7151522 * gl + 0.072175 * bl);
+      const fz = labF((0.0193339 * rl + 0.119192 * gl + 0.9503041 * bl) / 1.08883);
+      const la = 500 * (fx - fy), lb = 200 * (fy - fz);
+      const wi = Math.min(1600, Math.round(Math.sqrt(la * la + lb * lb) * 10));
+      const fy2 = fy;
+      const fx2 = fy2 + (la + warmthLut.a[wi]) / 500;
+      const fz2 = fy2 - (lb + warmthLut.b[wi]) / 200;
+      const X = labFinv(fx2) * 0.95047, Y = labFinv(fy2), Z = labFinv(fz2) * 1.08883;
+      const rl2 = 3.2404542 * X - 1.5371385 * Y - 0.4985314 * Z;
+      const gl2 = -0.969266 * X + 1.8760108 * Y + 0.041556 * Z;
+      const bl2 = 0.0556434 * X - 0.2040259 * Y + 1.0572252 * Z;
+      r = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, rl2)) * 4096)];
+      g = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, gl2)) * 4096)];
+      b = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, bl2)) * 4096)];
+    }
+
+    if (tint !== 0) {
+      const rl = SRGB_TO_LIN[Math.round(Math.min(1, Math.max(0, r)) * 1024)];
+      const gl = SRGB_TO_LIN[Math.round(Math.min(1, Math.max(0, g)) * 1024)];
+      const bl = SRGB_TO_LIN[Math.round(Math.min(1, Math.max(0, b)) * 1024)];
+      const fx = labF((0.4124564 * rl + 0.3575761 * gl + 0.1804375 * bl) / 0.95047);
+      const fy = labF(0.2126729 * rl + 0.7151522 * gl + 0.072175 * bl);
+      const fz = labF((0.0193339 * rl + 0.119192 * gl + 0.9503041 * bl) / 1.08883);
+      const Lst = 116 * fy - 16, la = 500 * (fx - fy), lb = 200 * (fy - fz);
+      const ci = Math.min(1600, Math.round(Math.sqrt(la * la + lb * lb) * 10));
+      const mag = tintLut.f[ci] * tintGainL(Lst);
+      const fy2 = (Lst + TINT_DL * mag + 16) / 116;
+      const fx2 = fy2 + (la + mag * TINT_COS) / 500;
+      const fz2 = fy2 - (lb + mag * TINT_SIN) / 200;
+      const X = labFinv(fx2) * 0.95047, Y = labFinv(fy2), Z = labFinv(fz2) * 1.08883;
+      const rl2 = 3.2404542 * X - 1.5371385 * Y - 0.4985314 * Z;
+      const gl2 = -0.969266 * X + 1.8760108 * Y + 0.041556 * Z;
+      const bl2 = 0.0556434 * X - 0.2040259 * Y + 1.0572252 * Z;
+      r = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, rl2)) * 4096)];
+      g = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, gl2)) * 4096)];
+      b = LIN_TO_SRGB[Math.round(Math.min(1, Math.max(0, bl2)) * 4096)];
+    }
+
+    data[i] = Math.min(255, Math.max(0, r * 255));
+    data[i + 1] = Math.min(255, Math.max(0, g * 255));
+    data[i + 2] = Math.min(255, Math.max(0, b * 255));
+  }
+  ctx.putImageData(imgData, 0, 0);
+}
+
+// ==========================================
+// [10] 暖かみ (Warmth) テーブル
+// ==========================================
+const WARMTH_NODES = [0, 0.5, 1.5, 3, 6, 11, 19, 32, 52, 82, 130];
+const WARMTH_PLUS_A = [0.12, 1.11, 1.98, 3.07, 3.85, 6.3, 8.03, 5.7, 6.01, 10.31, 10.31];
+const WARMTH_PLUS_B = [1.38, 2.2, 6.26, 7.14, 8.34, 12.3, 13.96, 17.71, 16.97, 18.44, 18.44];
+const WARMTH_MINUS_A = [-0.18, -0.57, -1.89, -2.26, -2.41, -4.78, -5.55, -5.28, -9.28, -20.98, -20.98];
+const WARMTH_MINUS_B = [-1.2, -2.65, -5.78, -7.07, -8.45, -12.39, -14.52, -17.08, -21.25, -27.84, -27.84];
+
+function labF(t) { return t > 216 / 24389 ? Math.cbrt(t) : (24389 / 27 * t + 16) / 116; }
+function labFinv(t) { const t3 = t * t * t; return t3 > 216 / 24389 ? t3 : (116 * t - 16) / (24389 / 27); }
+
+function buildWarmthLut(warmth) {
+  const A = warmth > 0 ? WARMTH_PLUS_A : WARMTH_MINUS_A;
+  const B = warmth > 0 ? WARMTH_PLUS_B : WARMTH_MINUS_B;
+  const s = Math.min(1, Math.abs(warmth));
+  const n = 1600;
+  const a = new Float32Array(n + 1);
+  const b = new Float32Array(n + 1);
+  let seg = 0;
+  for (let i = 0; i <= n; i++) {
+    const C = i / 10;
+    while (seg < WARMTH_NODES.length - 2 && C > WARMTH_NODES[seg + 1]) seg++;
+    const t = Math.min(1, Math.max(0, (C - WARMTH_NODES[seg]) / (WARMTH_NODES[seg + 1] - WARMTH_NODES[seg])));
+    a[i] = s * (A[seg] + (A[seg + 1] - A[seg]) * t);
+    b[i] = s * (B[seg] + (B[seg + 1] - B[seg]) * t);
+  }
+  return { a, b };
+}
+
+// ==========================================
+// [11] 色合い (Tint) テブル
+// ==========================================
+const TINT_C_NODES = [0, 0.5, 1, 2, 3, 5, 8, 12, 18, 25, 35, 50, 70, 100, 160];
+const TINT_F_NODES = [0, 1.6, 3.64, 6.35, 7.26, 8.22, 10.56, 12.52, 13.9, 15.0, 16.4, 16.7, 16.9, 16.5, 16.5];
+const TINT_L_NODES = [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100];
+const TINT_G_NODES = [0.568, 0.821, 0.824, 0.879, 0.891, 0.969, 1.0, 0.994, 0.965, 0.977, 0.612];
+const TINT_ANGLE = -32.21 * Math.PI / 180;
+const TINT_COS = Math.cos(TINT_ANGLE), TINT_SIN = Math.sin(TINT_ANGLE);
+const TINT_DL = -0.0723;
+
+function tintInterp(nodes, vals, x) {
+  if (x <= nodes[0]) return vals[0];
+  const n = nodes.length;
+  if (x >= nodes[n - 1]) return vals[n - 1];
+  let k = 0;
+  while (k < n - 2 && x > nodes[k + 1]) k++;
+  const t = (x - nodes[k]) / (nodes[k + 1] - nodes[k]);
+  return vals[k] + (vals[k + 1] - vals[k]) * t;
+}
+function tintGainL(L) { return tintInterp(TINT_L_NODES, TINT_G_NODES, L); }
+
+function buildTintLut(tint) {
+  const n = 1600;
+  const f = new Float32Array(n + 1);
+  for (let i = 0; i <= n; i++) f[i] = tint * tintInterp(TINT_C_NODES, TINT_F_NODES, i / 10);
+  return { f };
+}
+
+// 既存のLUT構築関数群
+const SRGB_TO_LIN = new Float32Array(1025);
+const LIN_TO_SRGB = new Float32Array(4097);
+for (let i = 0; i <= 1024; i++) {
+  const c = i / 1024;
+  SRGB_TO_LIN[i] = c <= 0.04045 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+}
+for (let i = 0; i <= 4096; i++) {
+  const l = i / 4096;
+  LIN_TO_SRGB[i] = l <= 0.0031308 ? l * 12.92 : 1.055 * Math.pow(l, 1 / 2.4) - 0.055;
+}
+
+const SATURATION_LEVELS = [0, 25, 50, 75, 100];
+const SATURATION_A = [
+  [1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1.73, 1.57, 1.52, 1.37, 1.32, 1.27, 1.22, 1.17, 1.12, 1.07, 1.07, 1.12],
+  [2.55, 2.15, 2, 1.75, 1.7, 1.6, 1.45, 1.3, 1.2, 1.15, 1.1, 1.2],
+  [3.26, 2.96, 2.66, 2.31, 2.16, 2.01, 1.91, 1.71, 1.61, 1.45, 1.4, 1.56],
+  [3.28, 3.03, 2.84, 2.44, 2.49, 2.34, 2.19, 1.99, 1.84, 1.74, 1.74, 1.84]
+];
+const SATURATION_H = [
+  [1, 1, 1, 1, 1, 1],
+  [0.83, 0.92, 1.17, 1.1, 1.06, 0.92],
+  [0.71, 0.88, 1.28, 1.18, 1.07, 0.89],
+  [0.72, 0.99, 1.28, 1.12, 1.02, 0.89],
+  [0.78, 1.03, 1.26, 1.11, 0.93, 0.89]
+];
+
+function buildSaturationLut(saturation) {
+  const s = Math.min(100, Math.max(0, saturation * 100));
+  let li = 0;
+  while (li < SATURATION_LEVELS.length - 2 && s > SATURATION_LEVELS[li + 1]) li++;
+  const t = (s - SATURATION_LEVELS[li]) / (SATURATION_LEVELS[li + 1] - SATURATION_LEVELS[li]);
+  const mix = (tbl) => tbl[li].map((v, j) => v + (tbl[li + 1][j] - v) * t);
+  const A = mix(SATURATION_A);
+  const a = new Float32Array(1025);
+  for (let i = 0; i <= 1024; i++) {
+    const pos = Math.min(A.length - 1, Math.max(0, (i / 1024) * A.length - 0.5));
+    const j = Math.min(A.length - 2, Math.floor(pos));
+    a[i] = A[j] + (A[j + 1] - A[j]) * (pos - j);
+  }
+  return { a, h: mix(SATURATION_H) };
+}
+
+const BLACKPOINT_LEVELS = [-100, -75, -50, -25, 0, 25, 50, 75, 100];
+const BLACKPOINT_F = [
+  [0.243, 0.247, 0.254, 0.263, 0.274, 0.289, 0.305, 0.323, 0.343, 0.364, 0.386, 0.41, 0.434, 0.459, 0.485, 0.512, 0.538, 0.567, 0.594, 0.621, 0.649, 0.679, 0.707, 0.734, 0.765, 0.793, 0.823, 0.851, 0.883, 0.91, 0.942, 0.968, 1],
+  [0.212, 0.216, 0.224, 0.234, 0.248, 0.263, 0.282, 0.301, 0.323, 0.346, 0.371, 0.396, 0.422, 0.447, 0.474, 0.501, 0.529, 0.559, 0.586, 0.614, 0.645, 0.673, 0.703, 0.731, 0.762, 0.79, 0.82, 0.851, 0.879, 0.91, 0.941, 0.968, 1],
+  [0.173, 0.178, 0.188, 0.201, 0.217, 0.234, 0.256, 0.277, 0.301, 0.326, 0.352, 0.379, 0.406, 0.433, 0.462, 0.492, 0.52, 0.55, 0.578, 0.609, 0.637, 0.669, 0.697, 0.727, 0.758, 0.789, 0.816, 0.848, 0.879, 0.91, 0.938, 0.968, 1],
+  [0.118, 0.126, 0.141, 0.158, 0.178, 0.199, 0.225, 0.251, 0.278, 0.305, 0.333, 0.363, 0.391, 0.422, 0.449, 0.481, 0.512, 0.54, 0.57, 0.601, 0.633, 0.662, 0.692, 0.723, 0.754, 0.785, 0.816, 0.847, 0.875, 0.906, 0.938, 0.968, 1],
+  [0, 0.031, 0.062, 0.094, 0.125, 0.156, 0.188, 0.219, 0.25, 0.281, 0.312, 0.344, 0.375, 0.406, 0.438, 0.469, 0.5, 0.531, 0.562, 0.594, 0.625, 0.656, 0.688, 0.719, 0.75, 0.781, 0.812, 0.844, 0.875, 0.906, 0.938, 0.969, 1],
+  [0, 0, 0, 0.001, 0.055, 0.106, 0.15, 0.187, 0.225, 0.258, 0.293, 0.328, 0.36, 0.394, 0.426, 0.457, 0.492, 0.524, 0.555, 0.586, 0.621, 0.653, 0.684, 0.715, 0.747, 0.777, 0.809, 0.844, 0.875, 0.906, 0.938, 0.968, 1],
+  [0, 0, 0, 0, 0, 0, 0.056, 0.126, 0.178, 0.22, 0.262, 0.3, 0.338, 0.373, 0.409, 0.443, 0.476, 0.512, 0.545, 0.578, 0.613, 0.646, 0.676, 0.711, 0.743, 0.773, 0.809, 0.84, 0.871, 0.902, 0.938, 0.968, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0.029, 0.123, 0.182, 0.233, 0.275, 0.318, 0.355, 0.393, 0.429, 0.465, 0.501, 0.535, 0.57, 0.605, 0.637, 0.672, 0.705, 0.739, 0.771, 0.805, 0.836, 0.871, 0.902, 0.934, 0.968, 1],
+  [0, 0, 0, 0, 0, 0, 0, 0, 0.023, 0.127, 0.194, 0.246, 0.293, 0.335, 0.376, 0.414, 0.454, 0.49, 0.526, 0.561, 0.597, 0.633, 0.665, 0.699, 0.734, 0.768, 0.801, 0.835, 0.867, 0.902, 0.934, 0.967, 1]
+];
+
+function buildBlackPointLut(blackPoint) {
+  const s = Math.min(100, Math.max(-100, blackPoint * 100));
+  let li = 0;
+  while (li < BLACKPOINT_LEVELS.length - 2 && s > BLACKPOINT_LEVELS[li + 1]) li++;
+  const t = (s - BLACKPOINT_LEVELS[li]) / (BLACKPOINT_LEVELS[li + 1] - BLACKPOINT_LEVELS[li]);
+  const F = BLACKPOINT_F[li].map((v, j) => v + (BLACKPOINT_F[li + 1][j] - v) * t);
+  const n = 1024;
+  const lut = new Float32Array(n + 1);
+  for (let i = 0; i <= n; i++) lut[i] = lerpUniform(F, i / n);
+  return lut;
+}
+
+const BRIGHT_MAX = {
+  fx: [0.0, 0.039, 0.322, 0.463, 0.592, 0.714, 0.831, 0.945, 1.0],
+  fy: [0.0, 0.068, 0.453, 0.627, 0.767, 0.874, 0.952, 0.995, 1.0],
+  kx: [0.0, 0.021, 0.812, 0.979, 1.0],
+  ky: [1.3, 1.3, 0.7, 0.37, 0.37]
+};
+const BRIGHT_MIN = {
+  fx: [0.0, 0.404, 0.498, 0.678, 0.835, 1.0],
+  fy: [0.0, 0.007, 0.155, 0.426, 0.689, 0.995],
+  kx: [0.0, 0.021, 0.146, 0.396, 0.521, 0.604, 0.771, 0.896, 0.979, 1.0],
+  ky: [0.55, 0.55, 0.47, 1.37, 1.45, 1.7, 1.62, 1.72, 1.62, 1.62]
+};
+
+function interpKnots(xs, ys, v) {
+  let s = 0;
+  while (s < xs.length - 2 && v > xs[s + 1]) s++;
+  const t = (v - xs[s]) / (xs[s + 1] - xs[s]);
+  return ys[s] + (ys[s + 1] - ys[s]) * Math.min(1, Math.max(0, t));
+}
+
+function buildToneLut(t, p) {
+  const n = 1024;
+  const f = new Float32Array(n + 1), k = new Float32Array(n + 1);
+  for (let i = 0; i <= n; i++) {
+    const y = i / n;
+    f[i] = y + p * (interpKnots(t.fx, t.fy, y) - y);
+    k[i] = 1 + p * (interpKnots(t.kx, t.ky, y) - 1);
+  }
+  return { f, k };
+}
+
+function buildBrightnessLut(brightness) {
+  return buildToneLut(brightness > 0 ? BRIGHT_MAX : BRIGHT_MIN, Math.min(1, Math.abs(brightness)));
+}
+
+const SHADOW_LEVELS = [-100, -75, -50, -25, 0, 25, 50, 75, 100];
+const SHADOW_F = [
+  [0, 0, 0, 0, 0.092, 0.222, 0.314, 0.395, 0.47, 0.543, 0.613, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+  [0, 0, 0, 0.002, 0.148, 0.248, 0.33, 0.406, 0.477, 0.547, 0.617, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+  [0, 0.019, 0.056, 0.099, 0.188, 0.271, 0.346, 0.417, 0.484, 0.552, 0.619, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+  [0.004, 0.048, 0.105, 0.16, 0.229, 0.297, 0.363, 0.43, 0.496, 0.559, 0.622, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+  [0, 0.062, 0.125, 0.188, 0.25, 0.312, 0.375, 0.438, 0.5, 0.562, 0.625, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+  [0.008, 0.068, 0.135, 0.2, 0.265, 0.329, 0.391, 0.451, 0.509, 0.567, 0.627, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+  [0.008, 0.081, 0.159, 0.233, 0.302, 0.37, 0.427, 0.485, 0.534, 0.581, 0.632, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+  [0.012, 0.098, 0.188, 0.282, 0.362, 0.436, 0.492, 0.541, 0.574, 0.605, 0.64, 0.688, 0.75, 0.812, 0.875, 0.938, 1],
+  [0.016, 0.117, 0.227, 0.341, 0.435, 0.52, 0.572, 0.614, 0.629, 0.635, 0.65, 0.688, 0.75, 0.812, 0.875, 0.938, 1]
+];
+const SHADOW_B = [
+  [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  [-0.01, -0.01, -0.01, -0.03, -0.03, -0.01, 0, 0, 0],
+  [-0.01, -0.02, -0.06, -0.11, -0.11, -0.05, -0.02, -0.01, 0],
+  [-0.01, -0.03, -0.14, -0.25, -0.25, -0.11, -0.05, -0.02, 0],
+  [-0.02, -0.06, -0.24, -0.42, -0.43, -0.2, -0.08, -0.03, 0]
+];
+const SHADOW_K = [
+  [0.15, 0.71, 1.36, 1.24, 1.21, 1.15, 1.1, 1.02, 0.95],
+  [0.2, 0.86, 1.31, 1.2, 1.15, 1.1, 1.06, 1.01, 0.97],
+  [1.35, 1.24, 1.2, 1.15, 1.09, 1.06, 1.04, 1.01, 0.97],
+  [1.12, 1.11, 1.06, 1.04, 1.02, 1, 1, 1, 0.97],
+  [1, 1, 1, 1, 1, 1, 1, 1, 1],
+  [1.1, 1.02, 1, 0.97, 0.97, 0.97, 0.97, 0.97, 0.97],
+  [1.3, 1.12, 1.04, 1, 0.97, 0.97, 0.97, 0.97, 1],
+  [1.55, 1.29, 1.15, 1.05, 0.99, 0.97, 0.97, 0.97, 1],
+  [1.82, 1.47, 1.29, 1.19, 1.06, 0.97, 0.97, 0.97, 1]
+];
+
+function lerpUniform(arr, v) {
+  const pos = Math.min(1, Math.max(0, v)) * (arr.length - 1);
+  const i = Math.min(arr.length - 2, Math.floor(pos));
+  return arr[i] + (arr[i + 1] - arr[i]) * (pos - i);
+}
+
+function buildShadowLut(shadows) {
+  const s = Math.min(100, Math.max(-100, shadows * 100));
+  let li = 0;
+  while (li < SHADOW_LEVELS.length - 2 && s > SHADOW_LEVELS[li + 1]) li++;
+  const t = (s - SHADOW_LEVELS[li]) / (SHADOW_LEVELS[li + 1] - SHADOW_LEVELS[li]);
+  const mix = (tbl) => tbl[li].map((v, j) => v + (tbl[li + 1][j] - v) * t);
+  const F = mix(SHADOW_F), B = mix(SHADOW_B), K = mix(SHADOW_K);
+  const n = 1024;
+  const f = new Float32Array(n + 1), b = new Float32Array(n + 1), k = new Float32Array(n + 1);
+  for (let i = 0; i <= n; i++) {
+    const y = i / n;
+    f[i] = lerpUniform(F, y); b[i] = lerpUniform(B, y); k[i] = lerpUniform(K, y);
+  }
+  return { f, b, k, local: s > 0 };
+}
+
+function sampleLowFreq(low, px, width) {
+  const py = (px / width) | 0;
+  const fx = Math.min(low.gw - 1, Math.max(0, (px - py * width + 0.5) / low.scale - 0.5));
+  const fy = Math.min(low.gh - 1, Math.max(0, (py + 0.5) / low.scale - 0.5));
+  const x0 = fx | 0, y0 = fy | 0;
+  const x1 = Math.min(low.gw - 1, x0 + 1), y1 = Math.min(low.gh - 1, y0 + 1);
+  const tx = fx - x0, ty = fy - y0;
+  const g = low.grid, w = low.gw;
+  return (g[y0 * w + x0] * (1 - tx) + g[y0 * w + x1] * tx) * (1 - ty) + (g[y1 * w + x0] * (1 - tx) + g[y1 * w + x1] * tx) * ty;
+}
+
+const HIGHLIGHT_MAX = {
+  fx: [0.0, 0.318, 0.694, 0.792, 0.878, 0.957, 1.0],
+  fy: [0.0, 0.325, 0.741, 0.835, 0.895, 0.965, 1.0],
+  kx: [0.0, 0.021, 0.812, 0.938, 0.979, 1.0],
+  ky: [1.0, 1.0, 0.57, 0.3, 0.17, 0.17]
+};
+const HIGHLIGHT_MIN = {
+  fx: [0.0, 0.255, 0.455, 0.749, 0.82, 0.878, 0.929, 0.973, 0.988, 1.0],
+  fy: [0.0, 0.251, 0.421, 0.624, 0.693, 0.779, 0.883, 0.991, 1.0, 1.0],
+  kx: [0.0, 0.021, 0.188, 0.479, 0.729, 0.812, 0.896, 0.938, 0.979, 1.0],
+  ky: [1.1, 1.1, 0.97, 1.17, 1.62, 1.95, 2.45, 2.77, 2.57, 2.57]
+};
+
+const BRIL_SIGMA_FRAC = 0.03;
+const BRIL_KNOT_L = [0.0, 0.1, 0.2, 0.28, 0.33, 0.38, 0.43, 0.475, 0.525, 0.575, 0.625, 0.68, 0.73, 0.775, 0.825, 0.87, 0.913, 0.96, 1.0];
+const BRIL_KNOT_F = [0.0, 0.161, 0.301, 0.406, 0.446, 0.488, 0.534, 0.567, 0.61, 0.653, 0.658, 0.681, 0.69, 0.69, 0.71, 0.73, 0.777, 0.91, 1.0];
+const BRIL_KNOT_K = [1.4, 1.4, 1.4, 1.37, 1.23, 1.11, 1.03, 0.88, 0.68, 0.58, 0.66, 0.82, 0.99, 1.22, 1.52, 2.0, 2.52, 2.3, 1.5];
+const BRIL_KNOT_C = [1.37, 1.39, 1.4, 1.42, 1.34, 1.29, 1.21, 1.12, 1.05, 1.05, 1.05, 1.03, 1.06, 1.17, 1.37, 1.69, 2.33, 2.0, 1.0];
+
+function buildBrillianceLut(p) {
+  const n = 1024;
+  const f = new Float32Array(n + 1), k = new Float32Array(n + 1), c = new Float32Array(n + 1);
+  let seg = 0;
+  for (let i = 0; i <= n; i++) {
+    const L = i / n;
+    while (seg < BRIL_KNOT_L.length - 2 && L > BRIL_KNOT_L[seg + 1]) seg++;
+    const t = (L - BRIL_KNOT_L[seg]) / (BRIL_KNOT_L[seg + 1] - BRIL_KNOT_L[seg]);
+    const F = BRIL_KNOT_F[seg] + (BRIL_KNOT_F[seg + 1] - BRIL_KNOT_F[seg]) * t;
+    const K = BRIL_KNOT_K[seg] + (BRIL_KNOT_K[seg + 1] - BRIL_KNOT_K[seg]) * t;
+    const C = BRIL_KNOT_C[seg] + (BRIL_KNOT_C[seg + 1] - BRIL_KNOT_C[seg]) * t;
+    f[i] = L + p * (F - L); k[i] = 1 + p * (K - 1); c[i] = 1 + p * (C - 1);
+  }
+  return { f, k, c };
+}
+
+function buildExposureLut(exposure) {
+  const n = 1024;
+  const lut = new Float32Array(n + 1);
+  const ev = exposure * 2.0, factor = Math.pow(2, ev);
+  for (let i = 0; i <= n; i++) {
+    const linear = SRGB_TO_LIN[i];
+    const adjusted = linear * factor;
+    lut[i] = LIN_TO_SRGB[Math.min(4096, Math.max(0, Math.round(adjusted * 4096)))];
+  }
+  return lut;
+}
+
+function buildBrillianceLowFreq(data, width, height) {
+  const m = Math.max(width, height);
+  const scale = Math.max(1, Math.ceil(m / 200));
+  const gw = Math.ceil(width / scale), gh = Math.ceil(height / scale);
+  const grid = new Float32Array(gw * gh), cnt = new Float32Array(gw * gh);
+  for (let y = 0; y < height; y++) {
+    const rowBase = ((y / scale) | 0) * gw;
+    for (let x = 0; x < width; x++) {
+      const i = (y * width + x) * 4, gi = rowBase + ((x / scale) | 0);
+      grid[gi] += (0.299 * data[i] + 0.587 * data[i + 1] + 0.114 * data[i + 2]) / 255;
+      cnt[gi]++;
+    }
+  }
+  for (let i = 0; i < grid.length; i++) grid[i] /= cnt[i];
+  const sigma = (BRIL_SIGMA_FRAC * m) / scale;
+  const r = Math.max(1, Math.round(Math.sqrt(sigma * sigma + 0.25) - 0.5));
+  const tmp = new Float32Array(gw * gh);
+  for (let pass = 0; pass < 3; pass++) {
+    for (let y = 0; y < gh; y++) boxBlurLine(grid, tmp, y * gw, 1, gw, r);
+    for (let x = 0; x < gw; x++) boxBlurLine(tmp, grid, x, gw, gh, r);
+  }
+  return { grid, gw, gh, scale };
+}
+
+function boxBlurLine(src, dst, off, stride, n, r) {
+  const inv = 1 / (2 * r + 1);
+  let sum = 0;
+  for (let k = -r; k <= r; k++) sum += src[off + Math.min(n - 1, Math.max(0, k)) * stride];
+  for (let i = 0; i < n; i++) {
+    dst[off + i * stride] = sum * inv;
+    sum += src[off + Math.min(n - 1, i + r + 1) * stride] - src[off + Math.max(0, i - r) * stride];
+  }
+}
+
+function drawInsideBorders(ctx, box, outerColor, outerSize, innerColor, innerSize) {
+  ctx.save();
+  let { x, y, w, h } = box;
+  if (outerSize > 0) { ctx.fillStyle = outerColor; drawFrame(ctx, x, y, w, h, outerSize); }
+  if (innerSize > 0) { ctx.fillStyle = innerColor; drawFrame(ctx, x + outerSize, y + outerSize, w - outerSize * 2, h - outerSize * 2, innerSize); }
+  ctx.restore();
+}
+
+function drawOutsideBorders(ctx, box, outerColor, outerSize, innerColor, innerSize) {
+  ctx.save();
+  let { x, y, w, h } = box;
+  if (innerSize > 0) { ctx.fillStyle = innerColor; drawFrame(ctx, x - innerSize, y - innerSize, w + innerSize * 2, h + innerSize * 2, innerSize); }
+  if (outerSize > 0) {
+    const offsetEnd = innerSize + outerSize;
+    ctx.fillStyle = outerColor; drawFrame(ctx, x - offsetEnd, y - offsetEnd, w + offsetEnd * 2, h + offsetEnd * 2, outerSize);
+  }
+  ctx.restore();
+}
+
+function drawFrame(ctx, x, y, w, h, size) {
+  if (w <= 0 || h <= 0 || size <= 0) return;
+  ctx.beginPath(); ctx.rect(x, y, w, h); ctx.rect(x + size, y + size, w - size * 2, h - size * 2); ctx.fill("evenodd");
+}
+</script>
+</body>
 </html>
